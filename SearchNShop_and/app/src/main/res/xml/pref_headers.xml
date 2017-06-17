@@ -1,0 +1,15 @@
+<preference-headers xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- These settings headers are only used on tablets. -->
+
+    <header
+            android:fragment="co.esclub.searchnshop.activity.SettingsActivity$GeneralPreferenceFragment"
+            android:title="@string/pref_header_general"
+            android:icon="@drawable/ic_info_black_24dp"/>
+
+    <header
+            android:fragment="co.esclub.searchnshop.activity.SettingsActivity$DataSyncPreferenceFragment"
+            android:title="@string/sync"
+            android:icon="@drawable/ic_sync_black_24dp"/>
+
+</preference-headers>

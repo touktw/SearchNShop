@@ -1,0 +1,34 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+
+    <!-- NOTE: EditTextPreference accepts EditText attributes. -->
+    <!-- NOTE: EditTextPreference's summary should be set to its value by the activity code. -->
+    <!--
+    <EditTextPreference
+            android:key="mall_name"
+            android:title="@string/mall_name"
+            android:selectAllOnFocus="true"
+            android:inputType="textCapWords"
+            android:capitalize="words"
+            android:singleLine="true"
+            android:maxLines="1"/>
+            -->
+    <!--<EditTextPreference-->
+            <!--android:key="search_range"-->
+            <!--android:title="@string/search_range"-->
+            <!--android:defaultValue="@string/search_range_default"-->
+            <!--android:selectAllOnFocus="true"-->
+            <!--android:inputType="numberSigned"-->
+            <!--android:capitalize="words"-->
+            <!--android:singleLine="true"-->
+            <!--android:maxLines="1"/>-->
+    <Preference
+            android:key="version"
+            android:title="@string/version_info"/>
+
+    <!-- NOTE: Hide buttons to simplify the UI. Users can touch outside the dialog to
+         dismiss it. -->
+    <!-- NOTE: ListPreference's summary should be set to its value by the activity code. -->
+
+
+</PreferenceScreen>

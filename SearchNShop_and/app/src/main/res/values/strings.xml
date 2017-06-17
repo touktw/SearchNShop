@@ -1,0 +1,77 @@
+<resources>
+    <string name="app_name">Search N Shop</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_detail">DetailActivity</string>
+    <string name="section_format">Position[%1$d] Title[%2$s]</string>
+    <string name="no_result">[No Search Result]</string>
+    <string name="new_item">New Item</string>
+    <string name="input_keyword_mall">Please input keyword and mall name\n If you need
+        input multiple keyword, use comma(,)
+    </string>
+    <string name="ok">OK</string>
+    <string name="item_already_exists">Item is already exists</string>
+    <string name="cancel">Cancel</string>
+    <string name="pref_header_general">General</string>
+
+
+    <string name="pref_title_sync_frequency">Sync frequency</string>
+    <string-array name="pref_sync_frequency_titles">
+        <item>1 minute</item>
+        <item>5 minutes</item>
+        <item>10 minutes</item>
+        <item>15 minutes</item>
+        <item>30 minutes</item>
+        <item>Never</item>
+    </string-array>
+    <string-array name="pref_sync_frequency_values">
+        <item>1</item>
+        <item>5</item>
+        <item>10</item>
+        <item>15</item>
+        <item>30</item>
+        <item>-1</item>
+    </string-array>
+
+    <string name="mall_name">Mall name</string>
+    <string name="sync">Sync</string>
+    <string name="use_auto_sync">Use auto sync</string>
+    <string name="title_activity_settings">Settings</string>
+    <string name="search_range">Search Range</string>
+    <string name="search_range_default">1000</string>
+    <string name="search_range_over">Search range is over (1 ~ 1000)</string>
+    <string name="banner_ad_unit_id">ca-app-pub-3759218081309192/1224243464</string>
+    <string name="menu_refresh">Refresh</string>
+    <string name="remindMallName">Remind mall name</string>
+    <string name="dont_show_again">\"Don\'t show again\"</string>
+    <string name="slide_title_1">Find</string>
+    <string name="slide_desc_1">Find your goods from naver shopping</string>
+    <string name="slide_title_2">It\'s easy</string>
+    <string name="slide_desc_2">Input your mall name and keyword, it\'s all</string>
+    <string name="slide_title_3">Check it</string>
+    <string name="slide_desc_3">You can check your good\'s ranking</string>
+    <string name="action_sort">Sort</string>
+    <string name="action_add">Add</string>
+    <string name="prompt_title_add">Add</string>
+    <string name="prompt_desc_add">Click here to add item</string>
+    <string name="prompt_title_sort">Sort</string>
+    <string name="prompt_desc_sort">Click here to sort</string>
+    <string name="detail_postion">No.%1$d</string>
+    <string name="naver_open_api_bi">Naver BI</string>
+    <string name="done">Done</string>
+    <string name="last_slide_title">Get start</string>
+    <string name="version_info">Version Information</string>
+    <string name="dialog_title_delete">Delete</string>
+    <string name="dialog_message_delete">Do you want delete %1$d item(s)?</string>
+    <string name="delete_mode">Delete mode</string>
+    <string name="prompt_title_item">Item</string>
+    <string name="prompt_desc_item">This is item\\nClick to show details\\nLong click to delete
+    </string>
+    <string name="prompt_title_detail_ranking">Ranking</string>
+    <string name="prompt_desc_detail_ranking">You can check your good\'s ranking</string>
+    <string name="prompt_title_detail_title">Good\'s name</string>
+    <string name="prompt_desc_detail_title">Your good\'s name, bold words are keyword.</string>
+    <string name="prompt_title_detail_link">Link</string>
+    <string name="prompt_desc_detail_link">You can go to your page from here</string>
+    <string name="prompt_title_detail_thumbnail">Image</string>
+    <string name="prompt_desc_detail_thumbnail">Your good\'s image</string>
+</resources>

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">키워드 검색기</string>
+    <string name="action_settings">설정</string>
+    <string name="title_activity_detail">상세 페이지</string>
+    <string name="section_format">Position[%1$d] Title[%2$s]</string>
+    <string name="no_result">[검색결과 없음]</string>
+    <string name="new_item">새 아이템</string>
+    <string name="input_keyword_mall">키워드와 상점명을 입력 해 주세요.\n키워드가 여러개일 경우 쉼표 (,) 로 분리 해 주세요.</string>
+    <string name="ok">확인</string>
+    <string name="item_already_exists">이미 있는 아이템 입니다.</string>
+    <string name="cancel">취소</string>
+    <string name="mall_name">상점명</string>
+    <string name="sync">동기화</string>
+    <string name="use_auto_sync">자동 동기화 사용</string>
+    <string name="pref_header_general">일반</string>
+
+    <string name="pref_title_sync_frequency">갱신 주기</string>
+    <string name="title_activity_settings">Settings</string>
+    <string name="search_range">검색 범위</string>
+    <string name="search_range_default">1000</string>
+    <string name="search_range_over">검색 범위를 벗어났습니다. (1 ~ 1000)</string>
+    <string name="banner_ad_unit_id">ca-app-pub-3759218081309192/1224243464</string>
+    <string name="menu_refresh">Refresh</string>
+    <string name="remindMallName">상점명 기억하기</string>
+    <string name="dont_show_again">"다시 보지 않습니다"</string>
+    <string name="slide_title_1">"궁금하셨나요"</string>
+    <string name="slide_desc_1">"내 상품의 네이버 랭킹은 몇번째일까?"</string>
+    <string name="slide_title_2">"찾아보세요"</string>
+    <string name="slide_desc_2">"상점 이름과 키워드만 넣으면 끝."</string>
+    <string name="slide_title_3">"확인하세요"</string>
+    <string name="slide_desc_3">"키워드 별로 상품의 랭킹을 알아 볼 수 있습니다."</string>
+    <string name="action_sort">"정렬"</string>
+    <string name="action_add">"추가"</string>
+    <string name="prompt_title_add">"추가"</string>
+    <string name="prompt_desc_add">"여기를 탭하여 키워드를 추가 합니다."</string>
+    <string name="prompt_title_sort">"정렬"</string>
+    <string name="prompt_desc_sort">"여기를 탭하여 키워드 정렬을 바꿉니다."</string>
+    <string name="detail_postion">%1$d 번째</string>
+    <string name="naver_open_api_bi">Naver BI</string>
+    <string name="done">"확인"</string>
+    <string name="last_slide_title">"시작하세요"</string>
+    <string name="version_info">버전정보</string>
+    <string name="dialog_title_delete">삭제</string>
+    <string name="dialog_message_delete">%1$d 개의 항목을 삭제 하시겠습니까?</string>
+    <string name="delete_mode">항목 삭제하기</string>
+    <string name="prompt_title_item">항목</string>
+    <string name="prompt_desc_item">"클릭하여 세부 항목을 봅니다.\n길게 눌러 항목 삭제를 합니다."</string>
+    <string name="prompt_title_detail_ranking">랭킹</string>
+    <string name="prompt_desc_detail_ranking">상품의 검색 랭킹 입니다.</string>
+    <string name="prompt_title_detail_title">상품명</string>
+    <string name="prompt_desc_detail_title">검색 키워드를 굵은 글씨로 표시합니다.</string>
+    <string name="prompt_title_detail_link">링크</string>
+    <string name="prompt_desc_detail_link">상품페이지로 연결 가능한 링크 입니다.</string>
+    <string name="prompt_title_detail_thumbnail">상품 이미지</string>
+    <string name="prompt_desc_detail_thumbnail">""</string>
+    <string-array name="pref_sync_frequency_titles">
+        <item>1 분</item>
+        <item>5 분</item>
+        <item>10 분</item>
+        <item>15 분</item>
+        <item>30 분</item>
+        <item>갱신 안함</item>
+    </string-array>
+    <string-array name="pref_sync_frequency_values">
+        <item>1</item>
+        <item>5</item>
+        <item>10</item>
+        <item>15</item>
+        <item>30</item>
+        <item>-1</item>
+    </string-array>
+</resources>

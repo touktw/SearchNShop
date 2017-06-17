@@ -1,0 +1,72 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                xmlns:tools="http://schemas.android.com/tools"
+                tools:context="co.esclub.searchnshop.activity.DetailActivity$PlaceholderFragment">
+
+    <android.support.v7.widget.CardView
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:card_view="http://schemas.android.com/apk/res-auto"
+            android:layout_margin="8dp"
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"
+            card_view:cardCornerRadius="5dp">
+        <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+            <!-- position -->
+            <TextView
+                    android:text="#9"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/position_label"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                    android:textStyle="bold"
+                    android:layout_alignParentTop="true"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginTop="8dp"/>
+            <!-- title -->
+            <TextView
+                    android:layout_below="@+id/position_label"
+                    android:text="Kaki men's half pants"
+                    android:maxLines="1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/title_label"
+                    android:textSize="18sp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginStart="16dp"/>
+            <!-- url -->
+            <TextView
+                    android:layout_below="@+id/title_label"
+                    android:text="http://storefarm.naver.com/humming_life"
+                    android:maxLines="1"
+                    android:autoLink="web"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/link_label"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginTop="8dp"
+
+                    android:layout_marginStart="16dp"/>
+            <!-- image -->
+            <ImageView
+                    android:layout_below="@+id/link_label"
+                    android:layout_alignParentBottom="true"
+                    android:src="@android:drawable/btn_star"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/thumbnail_image"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp"/>
+
+
+
+
+        </RelativeLayout>
+    </android.support.v7.widget.CardView>
+</RelativeLayout>

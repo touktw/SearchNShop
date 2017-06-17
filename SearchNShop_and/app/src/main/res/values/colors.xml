@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--<color name="colorPrimary">#3F51B5</color>-->
+    <!--<color name="colorPrimaryDark">#303F9F</color>-->
+    <color name="colorPrimary">#eceff1</color>
+    <color name="colorPrimaryDark">#eceff1</color>
+    <color name="promptBackGround">#81d4fa</color>
+    <color name="promptText">#ffffff</color>
+
+
+
+    <!--<color name="colorAccent">#FF4081</color>-->
+    <color name="textPrimary">#000000</color>
+    <color name="colorAccent">#3d5afe</color>
+    <color name="trGrey">#50808080</color>
+    <color name="drGrey">#ff808080</color>
+    <color name="colorWhite">#ffffff</color>
+    <color name="refresh_1">#ff4081</color>
+    <color name="refresh_2">#3d5afe</color>
+    <color name="refresh_3">#00c73c</color>
+    <color name="naver_green">#00c73c</color>
+</resources>
