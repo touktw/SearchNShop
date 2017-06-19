@@ -16,7 +16,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
 import android.widget.CheckBox
 import android.widget.EditText
 import co.esclub.searchnshop.BuildConfig
@@ -26,8 +25,8 @@ import co.esclub.searchnshop.model.RealmManager
 import co.esclub.searchnshop.model.SearchItem
 import co.esclub.searchnshop.net.NShopSearch
 import co.esclub.searchnshop.ui.PromptProvider
+import co.esclub.searchnshop.util.AdManager
 import co.esclub.searchnshop.util.Const
-import com.facebook.ads.AdView
 import io.realm.Realm
 import io.realm.RealmChangeListener
 import kotlinx.android.synthetic.main.activity_main.*
@@ -59,12 +58,7 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener, 
     }
 
     override fun onDestroy() {
-        if(USE_FB) {
-            (adView as com.facebook.ads.AdView).destroy()
-        }
-        if(USE_ADMOB) {
-            (adView as com.google.android.gms.ads.AdView).destroy()
-        }
+        adManager?.destroy()
         super.onDestroy()
         RealmManager.get().removeChangeListener(this)
         RealmManager.get().close()
@@ -109,28 +103,15 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener, 
         return true
     }
 
-    var adView: View? = null
-    private val USE_ADMOB = true
-    private val USE_FB = false
-
-    private fun adControl() {
-//        adView.loadAd(AdRequest.Builder().build()) ADMOB
-        if (USE_ADMOB) {
-            adView = com.google.android.gms.ads.AdView(this)
-            val ad = adView as com.google.android.gms.ads.AdView
-            ad.adSize = com.google.android.gms.ads.AdSize.SMART_BANNER
-            ad.adUnitId = "ca-app-pub-3759218081309192/1224243464"
-            layoutAds.addView(ad)
-            ad.loadAd(com.google.android.gms.ads.AdRequest.Builder().build())
-        }
-        if (USE_FB) {
-            adView = com.facebook.ads.AdView(this, "1350063585070996_1350068838403804",
-                    com.facebook.ads.AdSize.BANNER_HEIGHT_50)
-            layoutAds.addView(adView)
-
-            (adView as com.facebook.ads.AdView).loadAd()
+    var adManager: AdManager? = null
+    fun adControl() {
+        if (adManager == null) {
+            adManager = AdManager(AdManager.AdProvider.AD_MOB, this)
+            layoutAds.addView(adManager?.adView)
+            adManager?.load()
         }
     }
+
 
     private fun initUI() {
         setSupportActionBar(toolbar)

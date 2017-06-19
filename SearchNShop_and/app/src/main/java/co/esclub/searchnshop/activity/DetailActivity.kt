@@ -80,7 +80,7 @@ class DetailActivity : AppCompatActivity() {
     }
 
     /**
-     * A placeholder fragment containing a simple view.
+     * A placeholder fragment containing a simple adView.
      */
     class PlaceholderFragment() : android.support.v4.app.Fragment() {
         var itemId: String? = ""
