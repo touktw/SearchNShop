@@ -294,7 +294,7 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener, 
     private val REQ_INTRO = 1;
     fun startIntro() {
         val pref = PreferenceManager.getDefaultSharedPreferences(this)
-        if (pref.getBoolean("is_first${BuildConfig.VERSION_NAME}", true)) {
+        if (!pref.getBoolean("is_intro_showed", false)) {
 //            val realm = RealmManager.get()
 //            realm.beginTransaction()
 //            val item = SearchItem("남자4부반바지", "와이스토리지")
@@ -305,6 +305,9 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener, 
 //            realm.commitTransaction()
 //            adapter?.update(item.id)
             startActivityForResult(Intent(this, IntroActivity::class.java), REQ_INTRO)
+            pref.edit().putBoolean("is_intro_showed", true).apply()
+        } else {
+            showPrompt()
         }
     }
 
@@ -318,20 +321,21 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener, 
     }
 
     fun showPrompt() {
-        promptShowed = true
         val pref = PreferenceManager.getDefaultSharedPreferences(this)
-        Handler().postDelayed({
-            val prompts = LinkedList<MaterialTapTargetPrompt.Builder>()
-            prompts.add(PromptProvider.get(this@MainActivity, R.id.action_add,
-                    R.string.prompt_title_add, R.string.prompt_desc_add,
-                    R.drawable.ic_add_white_24dp, R.color.textPrimary, null))
-            prompts.add(PromptProvider.get(this@MainActivity, R.id.action_sort,
-                    R.string.prompt_title_sort, R.string.prompt_desc_sort,
-                    R.drawable.ic_sort_by_alpha_white_24dp, R.color.textPrimary, null))
-            prompts.add(PromptProvider.get(this@MainActivity, R.id.action_sort,
-                    R.string.prompt_title_item, R.string.prompt_desc_item,
-                    null, null, null).setTarget(recyclerView.width / 2F,
-                    toolbar.height + recyclerView.height / 2F))
+        if(!pref.getBoolean("is_prompt_showed", false)) {
+            promptShowed = true
+            Handler().postDelayed({
+                val prompts = LinkedList<MaterialTapTargetPrompt.Builder>()
+                prompts.add(PromptProvider.get(this@MainActivity, R.id.action_add,
+                        R.string.prompt_title_add, R.string.prompt_desc_add,
+                        R.drawable.ic_add_white_24dp, R.color.textPrimary, null))
+                prompts.add(PromptProvider.get(this@MainActivity, R.id.action_sort,
+                        R.string.prompt_title_sort, R.string.prompt_desc_sort,
+                        R.drawable.ic_sort_by_alpha_white_24dp, R.color.textPrimary, null))
+                prompts.add(PromptProvider.get(this@MainActivity, R.id.action_sort,
+                        R.string.prompt_title_item, R.string.prompt_desc_item,
+                        null, null, null).setTarget(recyclerView.width / 2F,
+                        toolbar.height + recyclerView.height / 2F))
 //            recyclerView.layoutManager.findViewByPosition(0)?.let {
 //                val viewHolder = recyclerView.getChildViewHolder(it) as RecyclerAdapter.ViewHolder
 //                prompts.add(PromptProvider.get(this@MainActivity, R.id.action_sort,
@@ -340,12 +344,14 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener, 
 //                        null, null, null).
 //                        setTarget(viewHolder.itemView))
 //            }
-            PromptProvider.show(prompts.iterator(), object : PromptProvider.OnEndPromptListener {
-                override fun onEnd() {
-                    promptShowed = false
-                    pref.edit().putBoolean("is_first${BuildConfig.VERSION_NAME}", false).apply()
-                }
-            })
-        }, 500)
+                PromptProvider.show(prompts.iterator(), object : PromptProvider.OnEndPromptListener {
+                    override fun onEnd() {
+                        promptShowed = false
+                        pref.edit().putBoolean("is_prompt_showed", true).apply()
+                    }
+                })
+            }, 500)
+        }
+
     }
 }
