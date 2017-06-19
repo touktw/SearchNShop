@@ -36,12 +36,12 @@ class IntroActivity : AppIntro() {
         addSlide(com.github.paolorotolo.appintro.AppIntroFragment.newInstance(
                 resources.getString(R.string.slide_title_2),
                 resources.getString(R.string.slide_desc_2),
-                R.drawable.slide_image_add, bgColor, txtColor, txtColor))
+                R.drawable.screenshot_add_item, bgColor, txtColor, txtColor))
         // check your mall's ranking
         addSlide(com.github.paolorotolo.appintro.AppIntroFragment.newInstance(
                 resources.getString(R.string.slide_title_3),
                 resources.getString(R.string.slide_desc_3),
-                R.drawable.slide_image_detail, bgColor, txtColor, txtColor))
+                R.drawable.screenshot_detail_view, bgColor, txtColor, txtColor))
         addSlide(LastSlideFragment() as android.support.v4.app.Fragment)
 
         setDoneText(resources.getString(R.string.done))
