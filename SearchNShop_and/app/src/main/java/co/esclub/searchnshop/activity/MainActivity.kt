@@ -16,8 +16,10 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import android.widget.CheckBox
 import android.widget.EditText
+import co.esclub.searchnshop.BuildConfig
 import co.esclub.searchnshop.R
 import co.esclub.searchnshop.adapter.RecyclerAdapter
 import co.esclub.searchnshop.model.RealmManager
@@ -25,7 +27,6 @@ import co.esclub.searchnshop.model.SearchItem
 import co.esclub.searchnshop.net.NShopSearch
 import co.esclub.searchnshop.ui.PromptProvider
 import co.esclub.searchnshop.util.Const
-import com.facebook.ads.AdSize
 import com.facebook.ads.AdView
 import io.realm.Realm
 import io.realm.RealmChangeListener
@@ -58,7 +59,12 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener, 
     }
 
     override fun onDestroy() {
-        adView?.destroy()
+        if(USE_FB) {
+            (adView as com.facebook.ads.AdView).destroy()
+        }
+        if(USE_ADMOB) {
+            (adView as com.google.android.gms.ads.AdView).destroy()
+        }
         super.onDestroy()
         RealmManager.get().removeChangeListener(this)
         RealmManager.get().close()
@@ -103,12 +109,27 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener, 
         return true
     }
 
-    var adView: AdView? = null
+    var adView: View? = null
+    private val USE_ADMOB = true
+    private val USE_FB = false
+
     private fun adControl() {
 //        adView.loadAd(AdRequest.Builder().build()) ADMOB
-        adView = AdView(this, "1350063585070996_1350068838403804", AdSize.BANNER_HEIGHT_50)
-        layoutAds.addView(adView)
-        adView?.loadAd()
+        if (USE_ADMOB) {
+            adView = com.google.android.gms.ads.AdView(this)
+            val ad = adView as com.google.android.gms.ads.AdView
+            ad.adSize = com.google.android.gms.ads.AdSize.SMART_BANNER
+            ad.adUnitId = "ca-app-pub-3759218081309192/1224243464"
+            layoutAds.addView(ad)
+            ad.loadAd(com.google.android.gms.ads.AdRequest.Builder().build())
+        }
+        if (USE_FB) {
+            adView = com.facebook.ads.AdView(this, "1350063585070996_1350068838403804",
+                    com.facebook.ads.AdSize.BANNER_HEIGHT_50)
+            layoutAds.addView(adView)
+
+            (adView as com.facebook.ads.AdView).loadAd()
+        }
     }
 
     private fun initUI() {
@@ -137,7 +158,7 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener, 
             }
             target.add(SearchItem(searchItem.keyWord, searchItem.mallName))
         }
-        NShopSearch.search(target,  object: NShopSearch.Listener{
+        NShopSearch.search(target, object : NShopSearch.Listener {
             override fun onPrepare() {
                 if (!swipeRefreshLayout.isRefreshing) {
                     swipeRefreshLayout.isRefreshing = true
@@ -149,7 +170,7 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener, 
                 results?.let {
                     val realm = RealmManager.get()
                     realm.beginTransaction()
-                    for(item in results) {
+                    for (item in results) {
                         realm.copyToRealmOrUpdate(item)
                     }
                     realm.commitTransaction()
@@ -292,7 +313,7 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener, 
     private val REQ_INTRO = 1;
     fun startIntro() {
         val pref = PreferenceManager.getDefaultSharedPreferences(this)
-        if (pref.getBoolean("is_first", true)) {
+        if (pref.getBoolean("is_first${BuildConfig.VERSION_NAME}", true)) {
 //            val realm = RealmManager.get()
 //            realm.beginTransaction()
 //            val item = SearchItem("남자4부반바지", "와이스토리지")
@@ -302,7 +323,7 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener, 
 //            }
 //            realm.commitTransaction()
 //            adapter?.update(item.id)
-            pref.edit().putBoolean("is_first", false).apply()
+            pref.edit().putBoolean("is_first${BuildConfig.VERSION_NAME}", false).apply()
             startActivityForResult(Intent(this, IntroActivity::class.java), REQ_INTRO)
         }
     }
