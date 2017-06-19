@@ -5,6 +5,7 @@ import android.support.annotation.ColorRes
 import co.esclub.searchnshop.R
 import co.esclub.searchnshop.fragments.LastSlideFragment
 import com.github.paolorotolo.appintro.AppIntro
+import com.github.paolorotolo.appintro.AppIntroFragment
 
 /**
  * Created by tae.kim on 13/06/2017.
@@ -28,20 +29,20 @@ class IntroActivity : AppIntro() {
         val txtColor = getColour(R.color.textPrimary)
 
         // find your item from naver shopping
-        addSlide(com.github.paolorotolo.appintro.AppIntroFragment.newInstance(
+        addSlide(AppIntroFragment.newInstance(
                 resources.getString(R.string.slide_title_1),
                 resources.getString(R.string.slide_desc_1),
-                R.drawable.slide_1, bgColor, txtColor, txtColor))
+                R.drawable.intro_1, bgColor, txtColor, txtColor))
         // input keyword and mall name
         addSlide(com.github.paolorotolo.appintro.AppIntroFragment.newInstance(
                 resources.getString(R.string.slide_title_2),
                 resources.getString(R.string.slide_desc_2),
-                R.drawable.screenshot_add_item, bgColor, txtColor, txtColor))
+                R.drawable.intro_2, bgColor, txtColor, txtColor))
         // check your mall's ranking
         addSlide(com.github.paolorotolo.appintro.AppIntroFragment.newInstance(
                 resources.getString(R.string.slide_title_3),
                 resources.getString(R.string.slide_desc_3),
-                R.drawable.screenshot_detail_view, bgColor, txtColor, txtColor))
+                R.drawable.intro_3, bgColor, txtColor, txtColor))
         addSlide(LastSlideFragment() as android.support.v4.app.Fragment)
 
         setDoneText(resources.getString(R.string.done))
