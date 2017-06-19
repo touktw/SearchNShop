@@ -304,7 +304,6 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener, 
 //            }
 //            realm.commitTransaction()
 //            adapter?.update(item.id)
-            pref.edit().putBoolean("is_first${BuildConfig.VERSION_NAME}", false).apply()
             startActivityForResult(Intent(this, IntroActivity::class.java), REQ_INTRO)
         }
     }
@@ -320,6 +319,7 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener, 
 
     fun showPrompt() {
         promptShowed = true
+        val pref = PreferenceManager.getDefaultSharedPreferences(this)
         Handler().postDelayed({
             val prompts = LinkedList<MaterialTapTargetPrompt.Builder>()
             prompts.add(PromptProvider.get(this@MainActivity, R.id.action_add,
@@ -343,6 +343,7 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener, 
             PromptProvider.show(prompts.iterator(), object : PromptProvider.OnEndPromptListener {
                 override fun onEnd() {
                     promptShowed = false
+                    pref.edit().putBoolean("is_first${BuildConfig.VERSION_NAME}", false).apply()
                 }
             })
         }, 500)
