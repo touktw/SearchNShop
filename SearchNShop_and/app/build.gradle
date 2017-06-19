@@ -12,8 +12,8 @@ android {
         applicationId "co.esclub.searchnshop"
         minSdkVersion 19
         targetSdkVersion 25
-        versionCode 120
-        versionName "1.2.0"
+        versionCode 121
+        versionName "1.2.1"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
     }
@@ -48,6 +48,7 @@ dependencies {
     compile 'com.squareup.okhttp3:logging-interceptor:3.8.0'
     compile 'com.facebook.android:audience-network-sdk:4.+'
     compile 'com.github.bumptech.glide:glide:4.0.0-RC0'
+    implementation 'com.google.firebase:firebase-ads:11.0.1'
 }
 
 apply plugin: 'com.google.gms.google-services'
