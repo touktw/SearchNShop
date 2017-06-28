@@ -1,15 +1,13 @@
 package co.esclub.searchnshop.net
 
 import android.os.AsyncTask
+import android.util.Log
 import co.esclub.searchnshop.model.SearchItem
 import co.esclub.searchnshop.model.SearchResult
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import java.util.*
 import java.util.concurrent.atomic.AtomicInteger
-import kotlin.collections.ArrayList
-import kotlin.collections.HashMap
 
 /**
  * Created by tae.kim on 17/06/2017.
@@ -37,7 +35,7 @@ object NShopSearch {
             for (searchItem in searchItems) {
                 results.add(searchItem)
                 searchItem.isSuccess = true
-                for (i in 0..10) {
+                for (i in 0..4) {
                     val startIndex = i * DISPLAY + 1
                     val call = NaverSearchService.retrofit.create(NaverSearchService::class.java)
                             .getShopItems(searchItem.keyWord, startIndex, DISPLAY)
@@ -78,12 +76,14 @@ object NShopSearch {
                 if (it.isSuccessful) {
                     val body = it.body()
                     var i = startIndex
-                    for (item in body!!.items!!) {
-                        if (item.mallName == searchItem.mallName) {
-                            item.position = i
-                            searchItem.itemTreeMap.put(i, item)
+                    body?.items?.let {
+                        for (item in it) {
+                            if (item.mallName == searchItem.mallName) {
+                                item.position = i
+                                searchItem.itemTreeMap.put(i, item)
+                            }
+                            i++
                         }
-                        i++
                     }
                     searchItem.lastSearchTime = System.currentTimeMillis()
                 }
