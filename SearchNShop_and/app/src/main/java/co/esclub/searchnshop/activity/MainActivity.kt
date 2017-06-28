@@ -18,7 +18,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.widget.CheckBox
 import android.widget.EditText
-import co.esclub.searchnshop.BuildConfig
+import android.widget.Toast
 import co.esclub.searchnshop.R
 import co.esclub.searchnshop.adapter.RecyclerAdapter
 import co.esclub.searchnshop.model.RealmManager
@@ -131,13 +131,17 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener, 
     }
 
     fun search(onlyFirst: Boolean) {
+        Toast.makeText(this, R.string.sync_only_before_10min, Toast.LENGTH_LONG).show()
         val searchItems = RealmManager.get().where(SearchItem::class.java).findAll()
         val target = ArrayList<SearchItem>()
+        val currTime = System.currentTimeMillis()
         for (searchItem in searchItems) {
             if (onlyFirst && searchItem.lastSearchTime > 0) {
                 continue
             }
-            target.add(SearchItem(searchItem.keyWord, searchItem.mallName))
+            if (currTime - searchItem.lastSearchTime > Const.SYNC_TIMEOUT_MILLIS) {
+                target.add(SearchItem(searchItem.keyWord, searchItem.mallName))
+            }
         }
         NShopSearch.search(target, object : NShopSearch.Listener {
             override fun onPrepare() {
@@ -322,7 +326,7 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener, 
 
     fun showPrompt() {
         val pref = PreferenceManager.getDefaultSharedPreferences(this)
-        if(!pref.getBoolean("is_prompt_showed", false)) {
+        if (!pref.getBoolean("is_prompt_showed", false)) {
             promptShowed = true
             Handler().postDelayed({
                 val prompts = LinkedList<MaterialTapTargetPrompt.Builder>()

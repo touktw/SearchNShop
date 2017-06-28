@@ -14,6 +14,7 @@ import android.view.animation.AnimationUtils
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import co.esclub.searchnshop.R
 import co.esclub.searchnshop.activity.DetailActivity
 import co.esclub.searchnshop.model.RealmManager
@@ -76,6 +77,11 @@ class RecyclerAdapter(private val context: Context, val messenger: Messenger, //
 
         viewHolder.imgButtonUpdate.tag = viewHolder
         viewHolder.imgButtonUpdate.setOnClickListener { v ->
+            Log.d("###", "time:" + (System.currentTimeMillis() - item.lastSearchTime))
+            if (System.currentTimeMillis() - item.lastSearchTime < Const.SYNC_TIMEOUT_MILLIS) {
+                Toast.makeText(context, R.string.allow_sync_after_10min, Toast.LENGTH_LONG).show()
+                return@setOnClickListener
+            }
             val searchItems = ArrayList<SearchItem>()
             searchItems.add(SearchItem(item.keyWord, item.mallName))
             NShopSearch.search(searchItems, object : NShopSearch.Listener {
