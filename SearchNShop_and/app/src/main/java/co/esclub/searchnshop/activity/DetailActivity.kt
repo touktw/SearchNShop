@@ -6,6 +6,9 @@ import android.support.v4.app.FragmentPagerAdapter
 import android.support.v4.view.ViewPager
 import android.support.v7.app.AppCompatActivity
 import co.esclub.searchnshop.R
+import co.esclub.searchnshop.model.item.SearchItem
+import co.esclub.searchnshop.model.item.ShopItem
+import co.esclub.searchnshop.model.repository.SearchItemRepository
 import co.esclub.searchnshop.ui.PromptProvider
 import com.bumptech.glide.Glide
 import kotlinx.android.synthetic.main.activity_detail.*
@@ -39,8 +42,7 @@ class DetailActivity : AppCompatActivity() {
         if (itemId.isNullOrEmpty() && savedInstanceState != null) {
             itemId = savedInstanceState.getString(ITEM_ID)
         }
-        val realm = co.esclub.searchnshop.model.RealmManager.get()
-        val searchItem = realm.where(co.esclub.searchnshop.model.SearchItem::class.java).equalTo("id", itemId).findFirst()
+        val searchItem: SearchItem = SearchItemRepository.get(itemId) as SearchItem
 
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
@@ -48,7 +50,7 @@ class DetailActivity : AppCompatActivity() {
 
         // Set up the ViewPager with the sections adapter.
         container.adapter = mSectionsPagerAdapter
-        keyword_label.text = searchItem.keyWord
+        keyword_label.text = searchItem?.keyWord
     }
 
     private val ITEM_ID: String? = "ITEM_ID"
@@ -84,11 +86,11 @@ class DetailActivity : AppCompatActivity() {
      */
     class PlaceholderFragment() : android.support.v4.app.Fragment() {
         var itemId: String? = ""
-        var shopItem: co.esclub.searchnshop.model.ShopItem? = null
+        var shopItem: ShopItem? = null
         var position = 0;
         var test = 0
 
-        constructor(searchItem: co.esclub.searchnshop.model.SearchItem?, position: Int) : this() {
+        constructor(searchItem: SearchItem?, position: Int) : this() {
             this.itemId = searchItem?.id
             this.position = position
             android.util.Log.d("###", "constructor itemId[${itemId}] position[${position}]")
@@ -106,8 +108,7 @@ class DetailActivity : AppCompatActivity() {
                 position = savedInstanceState.getInt(POSITION)
             }
             android.util.Log.d("###", "onCreate itemId[${itemId}] position[${position}]")
-            val realm = co.esclub.searchnshop.model.RealmManager.get()
-            val searchItem = realm.where(co.esclub.searchnshop.model.SearchItem::class.java).equalTo("id", itemId).findFirst()
+            val searchItem: SearchItem = SearchItemRepository.get(itemId) as SearchItem
             searchItem?.let {
                 it.items?.let { it1 ->
                     shopItem = it1[position]
@@ -183,7 +184,7 @@ class DetailActivity : AppCompatActivity() {
              * Returns a new instance of this fragment for the given section
              * number.
              */
-            fun newInstance(searchItem: co.esclub.searchnshop.model.SearchItem?, position: Int): co.esclub.searchnshop.activity.DetailActivity.PlaceholderFragment {
+            fun newInstance(searchItem: SearchItem?, position: Int): co.esclub.searchnshop.activity.DetailActivity.PlaceholderFragment {
                 val fragment = co.esclub.searchnshop.activity.DetailActivity.PlaceholderFragment(searchItem, position)
                 return fragment
             }
@@ -194,7 +195,7 @@ class DetailActivity : AppCompatActivity() {
      * A [FragmentPagerAdapter] that returns a fragment corresponding to
      * one of the sections/tabs/pages.
      */
-    inner class SectionsPagerAdapter(fm: android.support.v4.app.FragmentManager, val searchItem: co.esclub.searchnshop.model.SearchItem?) :
+    inner class SectionsPagerAdapter(fm: android.support.v4.app.FragmentManager, val searchItem: SearchItem?) :
             android.support.v4.app.FragmentPagerAdapter(fm) {
 
         override fun getItem(position: Int): android.support.v4.app.Fragment {

@@ -1,15 +1,12 @@
 package co.esclub.searchnshop.net
 
 import android.os.AsyncTask
-import co.esclub.searchnshop.model.SearchItem
-import co.esclub.searchnshop.model.SearchResult
+import co.esclub.searchnshop.model.item.SearchItem
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import java.util.*
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.collections.ArrayList
-import kotlin.collections.HashMap
 
 /**
  * Created by tae.kim on 17/06/2017.
@@ -40,7 +37,7 @@ object NShopSearch {
                 for (i in 0..10) {
                     val startIndex = i * DISPLAY + 1
                     val call = NaverSearchService.retrofit.create(NaverSearchService::class.java)
-                            .getShopItems(searchItem.keyWord, startIndex, DISPLAY)
+                            .getShopItems(searchItem.keyWord ?: "", startIndex, DISPLAY)
                     WAIT.incrementAndGet()
                     call.enqueue(CallBack(searchItem, startIndex, WAIT))
                 }

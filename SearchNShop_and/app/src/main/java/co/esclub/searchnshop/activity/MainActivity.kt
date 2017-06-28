@@ -18,17 +18,18 @@ import android.view.Menu
 import android.view.MenuItem
 import android.widget.CheckBox
 import android.widget.EditText
-import co.esclub.searchnshop.BuildConfig
 import co.esclub.searchnshop.R
 import co.esclub.searchnshop.adapter.RecyclerAdapter
-import co.esclub.searchnshop.model.RealmManager
-import co.esclub.searchnshop.model.SearchItem
+import co.esclub.searchnshop.model.db.SearchItemRealmManager
+import co.esclub.searchnshop.model.item.SearchItem
+import co.esclub.searchnshop.model.repository.SearchItemRepository
 import co.esclub.searchnshop.net.NShopSearch
 import co.esclub.searchnshop.ui.PromptProvider
 import co.esclub.searchnshop.util.AdManager
 import co.esclub.searchnshop.util.Const
 import io.realm.Realm
 import io.realm.RealmChangeListener
+import io.realm.RealmResults
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
 import uk.co.samuelwall.materialtaptargetprompt.MaterialTapTargetPrompt
@@ -60,8 +61,8 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener, 
     override fun onDestroy() {
         adManager?.destroy()
         super.onDestroy()
-        RealmManager.get().removeChangeListener(this)
-        RealmManager.get().close()
+
+        SearchItemRealmManager.removeChangeListener(this)
     }
 
     override fun onBackPressed() {
@@ -95,9 +96,9 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener, 
             R.id.action_settings -> startActivity(Intent(this, SettingsActivity::class.java))
             R.id.action_add -> if (!promptShowed) createDialog()
             R.id.action_sort -> if (!promptShowed) adapter?.changeSort()
-            R.id.action_delete -> if (adapter?.checkedItemIds?.size ?: 0 > 0) showDeleteDialog()
-            else
-                return super.onOptionsItemSelected(item)
+            R.id.action_delete -> if (adapter?.checkedItemIds?.size ?: 0 > 0) showDeleteDialog(false)
+            R.id.action_delete_all -> showDeleteDialog(true)
+            R.id.action_test -> startActivity(Intent(this, MacroActivity::class.java))
         }
 
         return true
@@ -121,7 +122,7 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener, 
                 R.color.refresh_2,
                 R.color.refresh_3)
 
-        RealmManager.get().addChangeListener(this)
+        SearchItemRealmManager.addChangeListener(this)
         adapter = RecyclerAdapter(this, messenger)
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.setHasFixedSize(true)
@@ -131,7 +132,8 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener, 
     }
 
     fun search(onlyFirst: Boolean) {
-        val searchItems = RealmManager.get().where(SearchItem::class.java).findAll()
+        val searchItems: RealmResults<SearchItem> =
+                SearchItemRepository.getAll() as RealmResults<SearchItem>
         val target = ArrayList<SearchItem>()
         for (searchItem in searchItems) {
             if (onlyFirst && searchItem.lastSearchTime > 0) {
@@ -149,12 +151,7 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener, 
             override fun onComplete(results: List<SearchItem>?) {
                 swipeRefreshLayout.isRefreshing = false
                 results?.let {
-                    val realm = RealmManager.get()
-                    realm.beginTransaction()
-                    for (item in results) {
-                        realm.copyToRealmOrUpdate(item)
-                    }
-                    realm.commitTransaction()
+                    SearchItemRepository.saveAll(results)
                 }
             }
 
@@ -162,19 +159,17 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener, 
     }
 
 
-    fun showDeleteDialog() {
+    fun showDeleteDialog(deleteAll: Boolean) {
         AlertDialog.Builder(this).setTitle(R.string.dialog_title_delete)
-                .setMessage(getString(R.string.dialog_message_delete, adapter?.checkedItemIds?.size))
+                .setMessage(if (deleteAll)
+                    getString(R.string.dialog_message_delete_all)
+                else
+                    getString(R.string.dialog_message_delete, adapter?.checkedItemIds?.size))
                 .setPositiveButton(android.R.string.ok, DialogInterface.OnClickListener {
                     dialog, _ ->
-                    adapter?.checkedItemIds?.let {
-                        val realm = RealmManager.get()
-                        realm.beginTransaction()
-                        for (i in it) {
-                            realm.where(SearchItem::class.java).equalTo("id", i).findAll()
-                                    .deleteAllFromRealm()
-                        }
-                        realm.commitTransaction()
+                    if (deleteAll) SearchItemRepository.deleteAll()
+                    else adapter?.checkedItemIds?.let {
+                        SearchItemRepository.deleteAll(it)
                     }
                     changeDeleteMode(false)
                     dialog.dismiss()
@@ -215,20 +210,21 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener, 
                             mallName = editMallName.hint.toString()
                         }
                         if (keywords.isNotEmpty() && mallName.isNotEmpty()) {
-                            val realm = RealmManager.get()
-                            realm.beginTransaction()
                             for (keyword in keywords) {
-                                val item = SearchItem(keyword, mallName)
-                                if (realm.where(SearchItem::class.java).equalTo(SearchItem.KEY_ID, item.id)
-                                        .findAll().size == 0) {
-                                    realm.copyToRealm(item)
+                                val item = SearchItem(keyword.trim(), mallName)
+                                Log.d("###", "save, id:" + item.id)
+                                if (SearchItemRepository.get(item.id) == null) {
+                                    Log.d("###", "save")
+                                    SearchItemRepository.save(item)
+
+                                    Log.d("###", "size:" + SearchItemRealmManager.getAll()?.size)
+                                    SearchItemRepository.dump()
                                 }
                             }
                             if (checkBoxRemindMallName.isChecked) {
                                 preference.edit().putString("mall_name", mallName).apply()
                             }
 
-                            realm.commitTransaction()
                             search(true)
 //                            Search(true, applicationContext).execute()
                             adapter?.notifyDataSetChanged()
@@ -241,7 +237,7 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener, 
 
     val messenger = Messenger(Handler({ msg ->
         when (msg.what) {
-            Const.MESSAGE_DELETE -> delete(msg.data?.getString(Const.KEY_ID))
+            Const.MESSAGE_DELETE -> SearchItemRepository.delete(msg.data?.getString(Const.KEY_ID))
             Const.MESSAGE_CHANGE_DELETE_MODE -> changeDeleteMode(true)
 
 //            Const.MESSAGE_UPDATE -> updateOne(msg.data?.getString(Const.KEY_ID),
@@ -249,14 +245,6 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener, 
         }
         false
     }))
-
-
-    private fun delete(id: String?) {
-        val realm = RealmManager.get()
-        realm.beginTransaction()
-        realm.where(SearchItem::class.java).equalTo("id", id).findAll().deleteAllFromRealm()
-        realm.commitTransaction()
-    }
 
     var syncTimeInMin = 0
     val syncHandler = Handler()
@@ -322,7 +310,7 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener, 
 
     fun showPrompt() {
         val pref = PreferenceManager.getDefaultSharedPreferences(this)
-        if(!pref.getBoolean("is_prompt_showed", false)) {
+        if (!pref.getBoolean("is_prompt_showed", false)) {
             promptShowed = true
             Handler().postDelayed({
                 val prompts = LinkedList<MaterialTapTargetPrompt.Builder>()

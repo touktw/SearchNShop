@@ -16,8 +16,8 @@ import android.widget.ImageView
 import android.widget.TextView
 import co.esclub.searchnshop.R
 import co.esclub.searchnshop.activity.DetailActivity
-import co.esclub.searchnshop.model.RealmManager
-import co.esclub.searchnshop.model.SearchItem
+import co.esclub.searchnshop.model.item.SearchItem
+import co.esclub.searchnshop.model.repository.SearchItemRepository
 import co.esclub.searchnshop.net.NShopSearch
 import co.esclub.searchnshop.util.Const
 import com.bumptech.glide.Glide
@@ -31,9 +31,51 @@ import kotlin.collections.ArrayList
  * Created by tae.kim on 06/06/2017.
  */
 
-class RecyclerAdapter(private val context: Context, val messenger: Messenger, //    var items: List<SearchItem>? = null
-                      var items: RealmResults<SearchItem> = RealmManager.get().where
-                      (SearchItem::class.java).findAll()) : RecyclerView.Adapter<RecyclerAdapter.ViewHolder>() {
+abstract class BaseRecyclerAdapter<VH_T : RecyclerView.ViewHolder> :
+        RecyclerView.Adapter<VH_T>(), ItemTouchHelperAdapter {
+
+}
+
+class MacroRecyclerAdapter : BaseRecyclerAdapter<MacroRecyclerAdapter.MacroViewHolder>() {
+    val items = ArrayList<String>()
+    override fun onCreateViewHolder(p0: ViewGroup?, p1: Int): MacroViewHolder {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun getItemCount(): Int {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun onItemMove(fromPosition: Int, toPosition: Int) {
+        if (fromPosition < toPosition) {
+            for (i in fromPosition..toPosition - 1) {
+                Collections.swap(items, i, i + 1)
+            }
+        } else {
+            for (i in fromPosition downTo toPosition + 1) {
+                Collections.swap(items, i, i - 1)
+            }
+        }
+        notifyItemMoved(fromPosition, toPosition)
+    }
+
+    override fun onBindViewHolder(p0: MacroViewHolder?, p1: Int) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun onItemDismiss(position: Int) {
+        items.removeAt(position)
+        notifyItemRemoved(position)
+    }
+
+    inner class MacroViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+
+    }
+}
+
+class RecyclerAdapter(private val context: Context, val messenger: Messenger,
+                      var items: RealmResults<SearchItem>? = SearchItemRepository.getAll() as RealmResults<SearchItem>?)
+    : RecyclerView.Adapter<RecyclerAdapter.ViewHolder>() {
     override fun onCreateViewHolder(viewGroup: ViewGroup, i: Int): ViewHolder {
         return ViewHolder(LayoutInflater.from(viewGroup.context).inflate(R.layout.card_item3, null))
     }
@@ -44,16 +86,16 @@ class RecyclerAdapter(private val context: Context, val messenger: Messenger, //
     override fun onBindViewHolder(viewHolder: ViewHolder, pos: Int) {
         Log.d("###", "onBindViewHolder pos[${pos}]")
         val position = pos
-        val item = items[position]
-        val title = "${item.keyWord},${item.mallName}"
+        val item = items?.get(position)
+        val title = "${item?.keyWord},${item?.mallName}"
         var content = context.getString(R.string.no_result)
-        val date = SDF.format(item.lastSearchTime)
+        val date = SDF.format(item?.lastSearchTime)
         viewHolder.itemView.tag = item
         if (!deleteMode) {
             viewHolder.deleteOverlay.visibility = View.INVISIBLE
             viewHolder.deleteCheck = false
         }
-        item.items?.let {
+        item?.items?.let {
             if (it.size > 0) {
                 viewHolder.thumbImage.visibility = View.VISIBLE
                 Glide.with(context).load(Uri.parse(it[0].image)).into(viewHolder.thumbImage)
@@ -77,7 +119,7 @@ class RecyclerAdapter(private val context: Context, val messenger: Messenger, //
         viewHolder.imgButtonUpdate.tag = viewHolder
         viewHolder.imgButtonUpdate.setOnClickListener { v ->
             val searchItems = ArrayList<SearchItem>()
-            searchItems.add(SearchItem(item.keyWord, item.mallName))
+            searchItems.add(SearchItem(item?.keyWord, item?.mallName))
             NShopSearch.search(searchItems, object : NShopSearch.Listener {
                 override fun onPrepare() {
                     viewHolder.itemView?.findViewById(R.id.imgButtonUpdate)
@@ -86,16 +128,7 @@ class RecyclerAdapter(private val context: Context, val messenger: Messenger, //
 
                 override fun onComplete(results: List<SearchItem>?) {
                     viewHolder.itemView?.findViewById(R.id.imgButtonUpdate)?.clearAnimation()
-                    results?.let {
-                        val realm = RealmManager.get()
-                        realm.beginTransaction()
-                        if (it.isNotEmpty()) {
-                            for (item in it) {
-                                realm.copyToRealmOrUpdate(item)
-                            }
-                        }
-                        realm.commitTransaction()
-                    }
+                    SearchItemRepository.saveAll(results)
                 }
 
             })
@@ -123,26 +156,12 @@ class RecyclerAdapter(private val context: Context, val messenger: Messenger, //
                 viewHolder.deleteCheck()
             }
             true
-//            val builder = AlertDialog.Builder(context)
-//            builder.setTitle(String.format("삭제[%s]", item?.id)).setMessage("삭제하시겠습니까?")
-//                    .setPositiveButton("확인", { dialog: DialogInterface, _: Int ->
-//                        val message = Message.obtain(null, Const.MESSAGE_DELETE)
-//                        val data = Bundle();
-//                        data.putString(Const.KEY_ID, item?.id);
-//                        message.data = data;
-//                        messenger.send(message)
-//                        dialog.dismiss()
-//                    })
-//                    .setNegativeButton("취소", { dialog: DialogInterface, _: Int ->
-//                        dialog.dismiss()
-//                    }).show()
-//            false
         }
 
     }
 
     override fun getItemCount(): Int {
-        return items.size
+        return items?.size ?: 0
     }
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -156,14 +175,16 @@ class RecyclerAdapter(private val context: Context, val messenger: Messenger, //
 
         fun deleteCheck() {
             val id = (itemView.tag as SearchItem).id
-            if (deleteCheck) {
-                deleteCheck = false
-                deleteOverlay.visibility = View.INVISIBLE
-                checkedItemIds.remove(id)
-            } else {
-                deleteCheck = true
-                deleteOverlay.visibility = View.VISIBLE
-                checkedItemIds.add(id)
+            id?.let {
+                if (deleteCheck) {
+                    deleteCheck = false
+                    deleteOverlay.visibility = View.INVISIBLE
+                    checkedItemIds.remove(it)
+                } else {
+                    deleteCheck = true
+                    deleteOverlay.visibility = View.VISIBLE
+                    checkedItemIds.add(it)
+                }
             }
         }
     }
@@ -175,7 +196,9 @@ class RecyclerAdapter(private val context: Context, val messenger: Messenger, //
             Sort.ASCENDING -> sort = Sort.DESCENDING
             Sort.DESCENDING -> sort = Sort.ASCENDING
         }
-        items = items.sort("keyWord", sort)
+        items?.let {
+            items = it.sort("keyWord", sort)
+        }
         notifyDataSetChanged()
     }
 

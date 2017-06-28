@@ -74,4 +74,11 @@
     <string name="prompt_desc_detail_link">You can go to your page from here</string>
     <string name="prompt_title_detail_thumbnail">Image</string>
     <string name="prompt_desc_detail_thumbnail">Your good\'s image</string>
+    <string name="delete_all">Delete All</string>
+    <string name="dialog_message_delete_all">Do you want delete all?</string>
+
+    <string name="title_activity_fullscreen">FullscreenActivity</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
+    <string name="title_activity_macro">MacroActivity</string>
 </resources>
