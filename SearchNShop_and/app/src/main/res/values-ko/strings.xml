@@ -54,6 +54,8 @@
     <string name="prompt_desc_detail_link">상품페이지로 연결 가능한 링크 입니다.</string>
     <string name="prompt_title_detail_thumbnail">상품 이미지</string>
     <string name="prompt_desc_detail_thumbnail">""</string>
+    <string name="allow_sync_after_10min">"10분 후에 동기화가 가능합니다"</string>
+    <string name="sync_only_before_10min">"마지막 동기화 시간이 10분 이상인 항목만 동기화 됩니다"</string>
     <string-array name="pref_sync_frequency_titles">
         <item>1 분</item>
         <item>5 분</item>

@@ -74,4 +74,8 @@
     <string name="prompt_desc_detail_link">You can go to your page from here</string>
     <string name="prompt_title_detail_thumbnail">Image</string>
     <string name="prompt_desc_detail_thumbnail">Your good\'s image</string>
+    <string name="allow_sync_after_10min">Sync allow after 10 minutes</string>
+    <string name="sync_only_before_10min">Only items with last sync more than 10 minutes will be
+        synced
+    </string>
 </resources>
