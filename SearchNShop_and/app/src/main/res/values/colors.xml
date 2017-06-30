@@ -8,7 +8,6 @@
     <color name="promptText">#ffffff</color>
 
 
-
     <!--<color name="colorAccent">#FF4081</color>-->
     <color name="textPrimary">#000000</color>
     <color name="colorAccent">#3d5afe</color>
@@ -19,4 +18,6 @@
     <color name="refresh_2">#3d5afe</color>
     <color name="refresh_3">#00c73c</color>
     <color name="naver_green">#00c73c</color>
+
+    <color name="black_overlay">#66000000</color>
 </resources>

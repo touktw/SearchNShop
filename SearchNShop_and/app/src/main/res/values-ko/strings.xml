@@ -56,6 +56,10 @@
     <string name="prompt_desc_detail_thumbnail">""</string>
     <string name="allow_sync_after_10min">"10분 후에 동기화가 가능합니다"</string>
     <string name="sync_only_before_10min">"마지막 동기화 시간이 10분 이상인 항목만 동기화 됩니다"</string>
+    <string name="delete_all">"모두삭제"</string>
+    <string name="dialog_message_delete_all">"모두 삭제 하시겠습니까?"</string>
+    <string name="you_need_update">"업데이트 필요함"</string>
+    <string name="you_need_update_desc">"사용에 제약이 있을 수 있습니다.\n업데이트 하시겠습니까?"</string>
     <string-array name="pref_sync_frequency_titles">
         <item>1 분</item>
         <item>5 분</item>

@@ -1,9 +1,7 @@
 package co.esclub.searchnshop.net
 
 import android.os.AsyncTask
-import android.util.Log
-import co.esclub.searchnshop.model.SearchItem
-import co.esclub.searchnshop.model.SearchResult
+import co.esclub.searchnshop.model.item.SearchItem
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -38,7 +36,7 @@ object NShopSearch {
                 for (i in 0..4) {
                     val startIndex = i * DISPLAY + 1
                     val call = NaverSearchService.retrofit.create(NaverSearchService::class.java)
-                            .getShopItems(searchItem.keyWord, startIndex, DISPLAY)
+                            .getShopItems(searchItem.keyWord ?: "", startIndex, DISPLAY)
                     WAIT.incrementAndGet()
                     call.enqueue(CallBack(searchItem, startIndex, WAIT))
                 }
@@ -70,8 +68,8 @@ object NShopSearch {
     }
 
     class CallBack(val searchItem: SearchItem, private val startIndex: Int, val wait: AtomicInteger)
-        : Callback<SearchResult> {
-        override fun onResponse(call: Call<SearchResult>?, response: Response<SearchResult>?) {
+        : Callback<NaverSearchResult> {
+        override fun onResponse(call: Call<NaverSearchResult>?, response: Response<NaverSearchResult>?) {
             response?.let {
                 if (it.isSuccessful) {
                     val body = it.body()
@@ -91,7 +89,7 @@ object NShopSearch {
             wait.decrementAndGet()
         }
 
-        override fun onFailure(call: Call<SearchResult>?, t: Throwable?) {
+        override fun onFailure(call: Call<NaverSearchResult>?, t: Throwable?) {
             searchItem.isSuccess = false
             wait.decrementAndGet()
         }

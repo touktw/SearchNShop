@@ -76,6 +76,16 @@
     <string name="prompt_desc_detail_thumbnail">Your good\'s image</string>
     <string name="allow_sync_after_10min">Sync allow after 10 minutes</string>
     <string name="sync_only_before_10min">Only items with last sync more than 10 minutes will be
-        synced
+        synced</string>
+    <string name="delete_all">Delete All</string>
+    <string name="dialog_message_delete_all">Do you want delete all?</string>
+
+    <string name="title_activity_fullscreen">FullscreenActivity</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
+    <string name="title_activity_macro">MacroActivity</string>
+    <string name="you_need_update">You need update</string>
+    <string name="you_need_update_desc">If you don\'t update this application, there may be
+        restrictions to use.
     </string>
 </resources>
