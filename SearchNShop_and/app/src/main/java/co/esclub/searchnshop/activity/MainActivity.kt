@@ -1,7 +1,9 @@
 package co.esclub.searchnshop.activity
 
+import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Messenger
@@ -18,12 +20,15 @@ import android.view.Menu
 import android.view.MenuItem
 import android.widget.CheckBox
 import android.widget.EditText
+import co.esclub.searchnshop.BuildConfig
 import co.esclub.searchnshop.R
 import co.esclub.searchnshop.adapter.RecyclerAdapter
 import co.esclub.searchnshop.model.db.SearchItemRealmManager
 import co.esclub.searchnshop.model.item.SearchItem
 import co.esclub.searchnshop.model.repository.SearchItemRepository
 import co.esclub.searchnshop.net.NShopSearch
+import co.esclub.searchnshop.net.StoreVersionChecker
+import co.esclub.searchnshop.net.VersionCheckTask
 import co.esclub.searchnshop.ui.PromptProvider
 import co.esclub.searchnshop.util.AdManager
 import co.esclub.searchnshop.util.Const
@@ -55,7 +60,6 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener, 
 
         initUI()
         startIntro()
-
     }
 
     override fun onDestroy() {
@@ -71,6 +75,33 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener, 
             return
         }
         super.onBackPressed()
+    }
+
+    fun checkStoreVersion(context: Context) {
+        StoreVersionChecker.getVersion(packageName, object : VersionCheckTask.Listener {
+            override fun onGetVersion(storeVersion: String?) {
+                Log.d("###", "onGetVersion storeVersion:" + storeVersion + " currentVersion:" +
+                        BuildConfig.VERSION_NAME)
+                if (BuildConfig.VERSION_NAME != storeVersion) {
+                    AlertDialog.Builder(context).setTitle(R.string.you_need_update)
+                            .setMessage(R.string.you_need_update_desc)
+                            .setPositiveButton(android.R.string.ok, { _: DialogInterface, _: Int ->
+                                try {
+                                    startActivity(Intent(Intent.ACTION_VIEW,
+                                            Uri.parse("market://details?id=" + packageName)))
+                                } catch (anfe: android.content.ActivityNotFoundException) {
+                                    startActivity(Intent(Intent.ACTION_VIEW,
+                                            Uri.parse("https://play.google.com/store/apps/details?id=" + packageName)))
+                                }
+
+
+                            })
+                            .setNegativeButton(android.R.string.cancel, null)
+                            .show()
+                }
+            }
+
+        })
     }
 
     var isDeleteMode = false
@@ -324,14 +355,6 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener, 
                         R.string.prompt_title_item, R.string.prompt_desc_item,
                         null, null, null).setTarget(recyclerView.width / 2F,
                         toolbar.height + recyclerView.height / 2F))
-//            recyclerView.layoutManager.findViewByPosition(0)?.let {
-//                val viewHolder = recyclerView.getChildViewHolder(it) as RecyclerAdapter.ViewHolder
-//                prompts.add(PromptProvider.get(this@MainActivity, R.id.action_sort,
-//                        R.string.prompt_title_item, R.string.prompt_desc_item,
-//                        R.color.textPrimary, R.color.textPrimary, R.color.colorPrimaryDark,
-//                        null, null, null).
-//                        setTarget(viewHolder.itemView))
-//            }
                 PromptProvider.show(prompts.iterator(), object : PromptProvider.OnEndPromptListener {
                     override fun onEnd() {
                         promptShowed = false
@@ -339,6 +362,8 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener, 
                     }
                 })
             }, 500)
+        } else {
+            checkStoreVersion(this)
         }
 
     }

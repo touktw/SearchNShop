@@ -69,8 +69,8 @@ object NShopSearch {
     }
 
     class CallBack(val searchItem: SearchItem, private val startIndex: Int, val wait: AtomicInteger)
-        : Callback<SearchResult> {
-        override fun onResponse(call: Call<SearchResult>?, response: Response<SearchResult>?) {
+        : Callback<NaverSearchResult> {
+        override fun onResponse(call: Call<NaverSearchResult>?, response: Response<NaverSearchResult>?) {
             response?.let {
                 if (it.isSuccessful) {
                     val body = it.body()
@@ -88,7 +88,7 @@ object NShopSearch {
             wait.decrementAndGet()
         }
 
-        override fun onFailure(call: Call<SearchResult>?, t: Throwable?) {
+        override fun onFailure(call: Call<NaverSearchResult>?, t: Throwable?) {
             searchItem.isSuccess = false
             wait.decrementAndGet()
         }

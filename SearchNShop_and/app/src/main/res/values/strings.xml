@@ -81,4 +81,8 @@
     <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
     <string name="title_activity_macro">MacroActivity</string>
+    <string name="you_need_update">You need update</string>
+    <string name="you_need_update_desc">If you don\'t update this application, there may be
+        restrictions to use.
+    </string>
 </resources>
