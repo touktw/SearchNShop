@@ -1,7 +1,6 @@
 package co.esclub.searchnshop.model.item
 
-import android.util.Log
-
+import co.esclub.searchnshop.util.LogCat
 import java.util.TreeMap
 
 import io.realm.RealmList
@@ -14,6 +13,8 @@ import io.realm.annotations.PrimaryKey
  */
 
 open class SearchItem : RealmObject, Item {
+    @Ignore
+    val TAG = SearchItem::class.java.simpleName
 
     @PrimaryKey
     open var id: String? = null
@@ -40,16 +41,17 @@ open class SearchItem : RealmObject, Item {
     }
 
     fun dump() {
-        Log.d("###", "KEY_WORD: " + keyWord!!)
-        Log.d("###", "MALL_NAME: " + mallName!!)
+        LogCat.d(TAG, "KEY_WORD: " + keyWord!!)
+        LogCat.d(TAG, "MALL_NAME: " + mallName!!)
+        LogCat.d(TAG, "LAST_UPDATE_TIME" + lastSearchTime)
         if (items.size > 0) {
             for (item in items) {
-                Log.d("###", "====")
-                Log.d("###", "TITLE: " + item.title)
-                Log.d("###", "====")
+                LogCat.d(TAG, "====")
+                LogCat.d(TAG, "TITLE: " + item.title)
+                LogCat.d(TAG, "====")
             }
         } else {
-            Log.d("###", "Item size 0")
+            LogCat.d(TAG, "Item size 0")
         }
     }
 

@@ -8,5 +8,11 @@
         <attr name="metaButtonBarStyle" format="reference"/>
         <attr name="metaButtonBarButtonStyle" format="reference"/>
     </declare-styleable>
+    <declare-styleable name="SwipeRefreshLayout">
+        <attr name="refreshing" format="boolean"/>
+    </declare-styleable>
+    <declare-styleable name="RecyclerView">
+        <attr name="hasFixedSize" format="boolean"/>
+    </declare-styleable>
 
 </resources>

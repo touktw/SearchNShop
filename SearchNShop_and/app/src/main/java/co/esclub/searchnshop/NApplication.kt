@@ -2,6 +2,7 @@ package co.esclub.searchnshop
 
 import android.app.Application
 import co.esclub.searchnshop.model.db.SearchItemRealmManager
+import co.esclub.searchnshop.model.firebase.FirebaseService
 import io.realm.Realm
 
 /**
@@ -12,6 +13,7 @@ class NApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         Realm.init(this)
+        FirebaseService.signIn()
     }
 
     override fun onTerminate() {
