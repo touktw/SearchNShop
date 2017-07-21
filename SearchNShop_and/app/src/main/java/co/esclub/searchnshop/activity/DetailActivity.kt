@@ -42,7 +42,7 @@ class DetailActivity : AppCompatActivity() {
         if (itemId.isNullOrEmpty() && savedInstanceState != null) {
             itemId = savedInstanceState.getString(ITEM_ID)
         }
-        val searchItem: SearchItem = SearchItemRepository.get(itemId) as SearchItem
+        val searchItem = SearchItemRepository.get(itemId)
 
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
@@ -108,11 +108,9 @@ class DetailActivity : AppCompatActivity() {
                 position = savedInstanceState.getInt(POSITION)
             }
             android.util.Log.d("###", "onCreate itemId[${itemId}] position[${position}]")
-            val searchItem: SearchItem = SearchItemRepository.get(itemId) as SearchItem
+            val searchItem = SearchItemRepository.get(itemId)
             searchItem?.let {
-                it.items?.let { it1 ->
-                    shopItem = it1[position]
-                }
+                shopItem = it.items[position]
             }
         }
 

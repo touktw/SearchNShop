@@ -8,6 +8,7 @@ import com.google.firebase.auth.FirebaseUser
  */
 
 object FirebaseService {
+
     val auth = FirebaseAuth.getInstance()
     var isSignIn = false
 
@@ -15,12 +16,13 @@ object FirebaseService {
         return auth.currentUser
     }
 
-    fun signIn() {
+    fun signIn(listener: (isSignIn: Boolean) -> Unit) {
         auth.signInAnonymously()
                 .addOnCompleteListener { task ->
-                    if(task.isSuccessful) {
+                    if (task.isSuccessful) {
                         isSignIn = true
                     }
+                    listener.invoke(isSignIn)
                 }
     }
 }

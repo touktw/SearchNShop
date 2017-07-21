@@ -2,6 +2,7 @@ package co.esclub.searchnshop.model.item
 
 import co.esclub.searchnshop.model.firebase.NItem
 import com.google.gson.annotations.SerializedName
+import io.realm.DynamicRealmObject
 import io.realm.RealmObject
 
 /**
@@ -42,4 +43,12 @@ open class ShopItem : RealmObject, Item {
     @com.google.gson.annotations.SerializedName("mallName")
     open var mallName: String? = null
     open var position: Int = 0
+
+    constructor(item: DynamicRealmObject) {
+        this.title = item.getString("title")
+        this.link = item.getString("link")
+        this.image = item.getString("image")
+        this.mallName = item.getString("mallName")
+        this.position = item.getInt("position")
+    }
 }

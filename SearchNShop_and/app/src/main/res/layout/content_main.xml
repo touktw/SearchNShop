@@ -12,13 +12,6 @@
             app:layout_behavior="@string/appbar_scrolling_view_behavior"
             tools:showIn="@layout/activity_main"
             tools:context="co.esclub.searchnshop.activity.MainActivity">
-
-        <android.support.v4.widget.SwipeRefreshLayout
-                android:id="@+id/swipeRefreshLayout"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:onRefreshListener="@{model::onRefresh}"
-                app:refreshing="@{model.isRefreshing}">
             <android.support.v7.widget.RecyclerView
                     android:adapter="@{model.adapter}"
                     app:hasFixedSize="true"
@@ -26,7 +19,5 @@
                     android:id="@+id/recyclerView"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"/>
-        </android.support.v4.widget.SwipeRefreshLayout>
-
     </android.support.constraint.ConstraintLayout>
 </layout>

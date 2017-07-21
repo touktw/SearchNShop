@@ -13,8 +13,8 @@ android {
         applicationId "co.esclub.searchnshop"
         minSdkVersion 19
         targetSdkVersion 25
-        versionCode 125
-        versionName "1.2.5"
+        versionCode 123
+        versionName "1.2.3"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
     }
@@ -30,14 +30,14 @@ android {
 }
 
 dependencies {
-    compile fileTree(include: ['*.jar'], dir: 'libs')
-    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    androidTestImplementation('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    compile "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
     kapt "com.android.databinding:compiler:$gradle_version"
-    testCompile 'junit:junit:4.12'
-    compile 'com.android.support.constraint:constraint-layout:1.0.2'
+    testImplementation 'junit:junit:4.12'
+    implementation 'com.android.support.constraint:constraint-layout:1.0.2'
     implementation "com.android.support:cardview-v7:$support_lib_version"
     implementation "com.android.support:appcompat-v7:$support_lib_version"
     implementation "com.android.support:design:$support_lib_version"
@@ -45,23 +45,24 @@ dependencies {
     implementation "com.android.support:support-vector-drawable:$support_lib_version"
     implementation "com.google.android.gms:play-services-base:$play_service_version"
     implementation "com.google.android.gms:play-services-ads:$play_service_version"
-    compile 'com.github.apl-devs:appintro:v4.2.0'
-    compile 'uk.co.samuelwall:material-tap-target-prompt:1.10.0'
+    implementation 'com.github.apl-devs:appintro:v4.2.0'
+    implementation 'uk.co.samuelwall:material-tap-target-prompt:1.10.0'
     implementation 'com.android.support.constraint:constraint-layout:1.0.2'
-    compile 'com.squareup.retrofit2:retrofit:2.3.0'
-    compile 'com.squareup.retrofit2:converter-gson:2.3.0'
-    compile('com.squareup.retrofit2:converter-simplexml:2.3.0') {
-        exclude module: 'xpp3'
-    }
+    implementation 'com.squareup.retrofit2:retrofit:2.3.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.3.0'
+//    compile('com.squareup.retrofit2:converter-simplexml:2.3.0') {
+//        exclude module: 'xpp3'
+//    }
 
-    compile 'org.jsoup:jsoup:1.10.3'
-    compile 'com.squareup.okhttp3:logging-interceptor:3.8.0'
-    compile 'com.github.bumptech.glide:glide:4.0.0-RC0'
+//    compile 'org.jsoup:jsoup:1.10.3'
+//    compile 'com.squareup.okhttp3:logging-interceptor:3.8.0'
+    implementation 'com.github.bumptech.glide:glide:4.0.0-RC0'
     implementation "com.google.firebase:firebase-ads:$play_service_version"
 
     implementation 'com.android.support:support-v4:25.4.0'
     implementation "com.google.firebase:firebase-database:$play_service_version"
     implementation "com.google.firebase:firebase-auth:$play_service_version"
+    implementation 'com.firebase:firebase-jobdispatcher:0.7.0'
 }
 
 apply plugin: 'com.google.gms.google-services'

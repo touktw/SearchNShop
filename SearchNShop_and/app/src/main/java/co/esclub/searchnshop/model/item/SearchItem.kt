@@ -1,6 +1,7 @@
 package co.esclub.searchnshop.model.item
 
 import co.esclub.searchnshop.util.LogCat
+import io.realm.DynamicRealmObject
 import java.util.TreeMap
 
 import io.realm.RealmList
@@ -61,5 +62,29 @@ open class SearchItem : RealmObject, Item {
         fun makeID(keyWord: String?, mallName: String?): String {
             return keyWord + "_" + mallName
         }
+    }
+
+    constructor(item: DynamicRealmObject) {
+        this.keyWord = item.getString("keyWord")
+        this.mallName = item.getString("mallName")
+        this.lastSearchTime = item.getLong("lastSearchTime")
+        for (shopItem in item.getList("items")) {
+            shopItem?.let {
+                items.add(ShopItem(shopItem))
+            }
+        }
+    }
+
+    fun removeSpacing() {
+        this.keyWord = keyWord?.trim()?.replace(" ", "")
+        this.id = makeID(keyWord, mallName)
+    }
+
+    fun getTransItems(): RealmList<DynamicRealmObject>? {
+        val ret  = RealmList<DynamicRealmObject>()
+        for(item in items) {
+            ret.add(DynamicRealmObject(item))
+        }
+        return ret
     }
 }

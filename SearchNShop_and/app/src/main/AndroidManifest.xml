@@ -38,11 +38,13 @@
         <activity
                 android:name=".activity.IntroActivity"
                 android:theme="@style/AppTheme.NoActionBar"/>
-        <activity
-                android:name=".activity.MacroActivity"
-                android:label="@string/title_activity_macro"
-                android:theme="@style/AppTheme.NoActionBar">
-        </activity>
+        <service
+                android:name=".service.UpdateService"
+                android:exported="false">
+            <intent-filter>
+                <action android:name="com.firebase.jobdispatcher.ACTION_EXECUTE"/>
+            </intent-filter>
+        </service>
     </application>
 
 </manifest>

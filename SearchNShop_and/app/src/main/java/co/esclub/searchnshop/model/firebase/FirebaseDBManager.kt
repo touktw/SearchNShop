@@ -1,17 +1,18 @@
 package co.esclub.searchnshop.model.firebase
 
+import android.databinding.Observable
 import android.os.AsyncTask
 import android.text.format.DateUtils
-import co.esclub.searchnshop.model.db.SearchItemRealmManager
 import co.esclub.searchnshop.model.item.SearchItem
-import co.esclub.searchnshop.model.item.ShopItem
-import co.esclub.searchnshop.net.NShopSearch
+import co.esclub.searchnshop.model.repository.SearchItemRepository
 import co.esclub.searchnshop.net.NaverSearchService
 import co.esclub.searchnshop.util.LogCat
+import co.esclub.searchnshop.util.UUIDFactory
 import com.google.firebase.database.*
+import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.collections.HashMap
+import kotlin.collections.ArrayList
 
 /**
  * Created by tae.kim on 13/07/2017.
@@ -21,6 +22,7 @@ object FirebaseDBManager {
     val TAG = FirebaseDBManager::class.java.simpleName
     val datas = HashMap<String, SearchData>()
     val db = FirebaseDatabase.getInstance()
+    var user: User = User()
 
     init {
         db.reference.child("items").addChildEventListener(object : ChildEventListener {
@@ -42,6 +44,7 @@ object FirebaseDBManager {
                 data?.let {
                     LogCat.d(TAG, "keyword:${it.keyWord}")
                     datas[it.keyWord!!] = it
+                    updateToRepository(it)
                 }
             }
 
@@ -66,15 +69,57 @@ object FirebaseDBManager {
         })
     }
 
-    fun isNeedUpdate(query: String): Boolean {
-        val data = datas[query]
-        data?.let {
-            return (System.currentTimeMillis() - it.lastUpdateTime) > DateUtils.HOUR_IN_MILLIS
+    fun init() {
+        UUIDFactory.uuid.addOnPropertyChangedCallback(object : Observable.OnPropertyChangedCallback() {
+            override fun onPropertyChanged(p0: Observable?, p1: Int) {
+                if (p0 === UUIDFactory.uuid) {
+                    val uuid = p0.get()
+                    if (!uuid.isNullOrEmpty()) {
+                        initializeUserInfo(uuid)
+                    }
+                }
+            }
+
+        })
+        val uuid = UUIDFactory.uuid.get()
+        if (!uuid.isNullOrEmpty()) {
+            initializeUserInfo(uuid)
         }
-        return true
     }
 
-    fun loadOneShot(query: String, mallName: String) {
+    fun updateUser() {
+        db.reference.child("users").child(user.id).setValue(user)
+    }
+
+    fun initializeUserInfo(uuid: String) {
+        user.id = uuid
+        user.lastConnectTimeMillis = System.currentTimeMillis()
+        user.lastConnectTimeString = DateFormat.getDateTimeInstance().format(Date())
+        SearchItemRepository.getAll()?.let {
+
+            for (item in it.map { UserItem(it.keyWord, it.mallName) }) {
+                user.queries.put(item.id(), item)
+                loadOneShot(item.keyword!!)
+            }
+        }
+        updateUser()
+    }
+
+    fun checkVersion(listener: (value: Int) -> Unit) {
+        db.reference.child("version").addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onCancelled(error: DatabaseError?) {
+                LogCat.e(TAG, "getVersion error:${error?.toString()}")
+            }
+
+            override fun onDataChange(snapshot: DataSnapshot?) {
+                val value = snapshot?.value as Long
+                LogCat.d(TAG, "version:${value}")
+                listener.invoke(value.toInt())
+            }
+        })
+    }
+
+    fun loadOneShot(query: String) {
         LogCat.d(TAG, "loadOneShot query:" + query)
         db.reference.child("items").child(query)
                 .addListenerForSingleValueEvent(object : ValueEventListener {
@@ -88,7 +133,7 @@ object FirebaseDBManager {
                         data?.let {
                             it.keyWord?.let { key ->
                                 datas[key] = it
-                                updateToRepository(it, mallName)
+                                updateToRepository(it)
                             }
                         }
                     }
@@ -96,13 +141,15 @@ object FirebaseDBManager {
                 })
     }
 
-    private fun updateToRepository(data: SearchData, mallName: String) {
-        val searchItem = SearchItem(data.keyWord, mallName)
-        searchItem.lastSearchTime = data.lastUpdateTime
-        for (item in data.items.filter { it.mallName == mallName }) {
-            searchItem.items.add(ShopItem(item))
+    private fun updateToRepository(data: SearchData) {
+        LogCat.d(TAG, "updateToRepository query:${data.keyWord}")
+        SearchItemRepository.getAll()?.let { searchItems ->
+            for (searchItem in searchItems) {
+                if (data.keyWord == searchItem.keyWord) {
+                    SearchItemRepository.updateItem(searchItem, data)
+                }
+            }
         }
-        SearchItemRealmManager.save(searchItem)
     }
 
     fun getDate(dateString: String?): Long {
@@ -119,37 +166,60 @@ object FirebaseDBManager {
         return time
     }
 
-    class LoadDataTask(val query: String, val mallName: String) : AsyncTask<Void, Void, SearchData>() {
-        override fun doInBackground(vararg params: Void?): SearchData {
-            val searchData = SearchData()
-            searchData.keyWord = query
-            val itemMap = TreeMap<Int, NItem>()
-            for (i in 0..4) {
-                val startIndex = i * NShopSearch.DISPLAY + 1
-                val call = NaverSearchService.retrofit.create(NaverSearchService::class.java)
-                        .getShopItemsForFireBase(query, startIndex, NShopSearch.DISPLAY)
-                val response = call.execute()
-                if (response.isSuccessful) {
-                    val body = response.body()
-                    body?.let {
-                        it.items?.let { it2 ->
-                            searchData.lastUpdateTime = getDate(it.lastBuildDate)
-                            for (i in it2.indices) {
-                                val item = it2[i]
-                                item.position = startIndex + i
-                                itemMap[item.position] = item
+    fun load(query: String): SearchData? {
+        val searchData = SearchData()
+        var success = false
+        searchData.keyWord = query
+        val itemMap = TreeMap<Int, NItem>()
+        for (i in 0..4) {
+            val startIdx = i * 100 + 1
+            val call = NaverSearchService.retrofit.create(NaverSearchService::class.java)
+                    .getShopItemsForFireBase(query, startIdx, 100)
+            val res = call.execute()
+            if (res.isSuccessful) {
+                success = true
+                res.body()?.let {
+                    searchData.lastUpdateTime = getDate(it.lastBuildDate)
+                    it.items?.let { items ->
+                        for (idx in items.indices) {
+                            val item = items[idx]
+                            item.position = startIdx + idx
+                            itemMap[item.position] = item
+                        }
+                    }
+                }
+            }
+        }
+        if (success) {
+            searchData.items.addAll(itemMap.values)
+            db.reference.child("items").child(query).setValue(searchData)
+        }
+        return searchData
+    }
+
+    class LoadDataTask(val queries: List<String>?, val listener: (() -> Unit)?)
+        : AsyncTask<Void, Void, List<SearchData>>() {
+        override fun doInBackground(vararg params: Void?): List<SearchData> {
+            val ret = ArrayList<SearchData>()
+            queries?.let {
+                if (it.isNotEmpty()) {
+                    for (query in it) {
+                        if (query.isNotEmpty()) {
+                            load(query)?.let { data ->
+                                ret.add(data)
                             }
                         }
                     }
                 }
             }
-            searchData.items.addAll(itemMap.values)
-
-            db.reference.child("items").child(query).setValue(searchData)
-            return searchData
+            return ret
         }
 
-        override fun onPostExecute(result: SearchData?) {
+        override fun onPostExecute(result: List<SearchData>) {
+            for (data in result) {
+                updateToRepository(data)
+            }
+            listener?.invoke()
 //            result?.let {
 //                updateToRepository(it, mallName)
 //            }
@@ -157,7 +227,50 @@ object FirebaseDBManager {
         }
     }
 
-    fun queryDataFromNaver(query: String, mallName: String) {
-        LoadDataTask(query, mallName).execute()
+    fun queryDataFromNaver(queries: List<String>?, listener: (() -> Unit)?) {
+        LoadDataTask(queries, listener).execute()
+    }
+
+    fun addNew(target: List<SearchItem>, listener: (() -> Unit)?) {
+        for (item in target) {
+            val data = datas[item.keyWord]
+            if (data == null) {
+                item.keyWord?.let {
+                    queryDataFromNaver(Arrays.asList(it), listener)
+                }
+            } else {
+                updateToRepository(data)
+            }
+        }
+        addToUser(target.map { UserItem(it.keyWord, it.mallName) })
+    }
+
+    fun addToUser(items: List<UserItem>?) {
+        items?.let {
+            for (item in it) {
+                user.queries.put(item.id(), item)
+            }
+            updateUser()
+        }
+    }
+
+    fun deleteAll(deleteItems: List<String>?) {
+        LogCat.d(TAG, "deleteAll")
+        deleteItems?.let {
+            for (id in it) {
+                user.queries.remove(id)
+            }
+        }
+        updateUser()
+    }
+
+    fun checkForUpdate(listener: (() -> Unit)?) {
+        user.lastUpdateTimeString = DateFormat.getDateTimeInstance().format(Date())
+        updateUser()
+        queryDataFromNaver(datas.values
+                .filter { System.currentTimeMillis() - it.lastUpdateTime > DateUtils.HOUR_IN_MILLIS }
+                .map { it.keyWord!! }, {
+            listener?.invoke()
+        })
     }
 }

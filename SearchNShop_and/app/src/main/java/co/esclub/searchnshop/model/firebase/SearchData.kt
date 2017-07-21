@@ -9,6 +9,11 @@ import java.util.*
  * Created by tae.kim on 30/06/2017.
  */
 
+class QueryData {
+    var mallName: String? = null
+    var searchData: SearchData? = null
+}
+
 @IgnoreExtraProperties
 class SearchData {
     var keyWord: String? = null

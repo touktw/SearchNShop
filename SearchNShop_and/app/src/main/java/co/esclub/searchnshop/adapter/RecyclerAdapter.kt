@@ -38,8 +38,6 @@ class RecyclerAdapter(private val context: Context, val mainViewModel: MainViewM
     }
 
     override fun onBindViewHolder(viewHolder: ViewHolder, pos: Int) {
-        LogCat.d(TAG, "onBindViewHolder pos[${pos}]")
-
         val position = pos
         val item = items.get(position)
 

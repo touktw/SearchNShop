@@ -1,24 +1,18 @@
 package co.esclub.searchnshop.activity
 
-import android.content.DialogInterface
 import android.content.Intent
 import android.databinding.DataBindingUtil
 import android.os.Bundle
 import android.preference.PreferenceManager
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
-import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
+import co.esclub.searchnshop.BuildConfig
 import co.esclub.searchnshop.R
 import co.esclub.searchnshop.databinding.ActivityMainBinding
-import co.esclub.searchnshop.databinding.AddItemBinding
 import co.esclub.searchnshop.model.db.SearchItemRealmManager
-import co.esclub.searchnshop.model.item.SearchItem
-import co.esclub.searchnshop.model.repository.SearchItemRepository
-import co.esclub.searchnshop.net.NShopSearch
 import co.esclub.searchnshop.util.AdManager
-import co.esclub.searchnshop.viewmodel.AddItemModel
 import co.esclub.searchnshop.viewmodel.MainViewModel
 import io.realm.Realm
 import io.realm.RealmChangeListener
@@ -77,7 +71,7 @@ class MainActivity : AppCompatActivity(), RealmChangeListener<Realm> {
         val id = item.itemId
         when (id) {
             R.id.action_settings -> startActivity(Intent(this, SettingsActivity::class.java))
-            R.id.action_add -> if (!model.promptShowed) createDialog()
+            R.id.action_add -> if (!model.promptShowed) model.addNew()
             R.id.action_sort -> if (!model.promptShowed) model.adapter.changeSort()
             R.id.action_delete -> model.showDeleteDialog(false)
             R.id.action_delete_all -> model.showDeleteDialog(true)
@@ -100,59 +94,22 @@ class MainActivity : AppCompatActivity(), RealmChangeListener<Realm> {
     private fun initUI() {
         setSupportActionBar(toolbar)
 
-        swipeRefreshLayout.setColorSchemeResources(R.color.refresh_1,
-                R.color.refresh_2,
-                R.color.refresh_3)
+//        swipeRefreshLayout.setColorSchemeResources(R.color.refresh_1,
+//                R.color.refresh_2,
+//                R.color.refresh_3)
         SearchItemRealmManager.addChangeListener(this)
         adControl()
     }
 
-    fun searchNew(target: List<SearchItem>) {
-        NShopSearch.search(target, object : NShopSearch.Listener {
-            override fun onPrepare() {
-                model.isRefreshing.set(true)
-            }
-
-            override fun onComplete(results: List<SearchItem>?) {
-                model.isRefreshing.set(false)
-                results?.let {
-                    SearchItemRepository.saveAll(results)
-                }
-            }
-
-        })
-    }
-
-    fun createDialog() {
-        val view = LayoutInflater.from(this).inflate(R.layout.add_item, null)
-
-        val model = AddItemModel(this, object : AddItemModel.Listener {
-            override fun onSubmitted(target: List<SearchItem>) {
-                searchNew(target)
-                model.adapter.notifyDataSetChanged()
-            }
-
-        })
-        val binding = DataBindingUtil.bind<AddItemBinding>(view)
-        binding.model = model
-        AlertDialog.Builder(this)
-                .setTitle(getString(R.string.new_item))
-                .setMessage(getString(R.string.input_keyword_mall))
-                .setView(view)
-                .setPositiveButton(R.string.ok, { _: DialogInterface, _: Int ->
-                    model.submit(binding.editKeyWord.text.toString(),
-                            binding.editMallName.text.toString())
-                })
-                .setNegativeButton(R.string.cancel, null)
-                .show()
-    }
-
     override fun onResume() {
         super.onResume()
+        model.onResume()
+        showNewVersionNotice()
     }
 
     override fun onPause() {
         super.onPause()
+        model.onPause()
     }
 
     private val REQ_INTRO = 1;
@@ -163,6 +120,20 @@ class MainActivity : AppCompatActivity(), RealmChangeListener<Realm> {
             pref.edit().putBoolean("is_intro_showed", true).apply()
         } else {
             model.showPrompt()
+        }
+    }
+
+    fun showNewVersionNotice() {
+        if (!PreferenceManager.getDefaultSharedPreferences(this)
+                .getBoolean("isShowed${BuildConfig.VERSION_NAME}Notice", false)) {
+            AlertDialog.Builder(this)
+                    .setTitle(R.string.update_notice_title)
+                    .setMessage(R.string.update_notice)
+                    .setCancelable(false)
+                    .setPositiveButton(android.R.string.ok, { dialog, _ ->
+                        dialog.dismiss()
+                    })
+                    .show()
         }
     }
 

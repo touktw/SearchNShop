@@ -88,4 +88,6 @@
     <string name="you_need_update_desc">If you don\'t update this application, there may be
         restrictions to use.
     </string>
+    <string name="update_notice">Update notice</string>
+    <string name="update_notice_title">Update notice</string>
 </resources>

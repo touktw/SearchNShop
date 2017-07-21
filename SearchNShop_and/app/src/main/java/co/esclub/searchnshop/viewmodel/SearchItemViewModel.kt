@@ -2,16 +2,10 @@ package co.esclub.searchnshop.viewmodel
 
 import android.content.Intent
 import android.databinding.ObservableField
-import android.util.Log
-import android.view.View
-import android.view.animation.AnimationUtils
-import android.widget.Toast
 import co.esclub.searchnshop.R
 import co.esclub.searchnshop.activity.DetailActivity
 import co.esclub.searchnshop.databinding.CardItem3Binding
 import co.esclub.searchnshop.model.item.SearchItem
-import co.esclub.searchnshop.model.repository.SearchItemRepository
-import co.esclub.searchnshop.net.NShopSearch
 import co.esclub.searchnshop.util.Const
 import java.text.SimpleDateFormat
 import java.util.*
@@ -52,35 +46,11 @@ class SearchItemViewModel(val item: SearchItem, val binding: CardItem3Binding) {
     }
 
     fun itemSelect() {
-        if (item.items.size ?: 0 > 0) {
+        if (item.items.size > 0) {
             val intent = Intent(binding.context, DetailActivity::class.java)
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            intent.putExtra(Const.KEY_ID, item?.id)
+            intent.putExtra(Const.KEY_ID, item.id)
             binding.context?.startActivity(intent)
-        }
-    }
-
-    fun onUpdate(view: View) {
-        item.let {
-            Log.d("###", "time:" + (System.currentTimeMillis() - it.lastSearchTime))
-            if (System.currentTimeMillis() - it.lastSearchTime < Const.SYNC_TIMEOUT_MILLIS) {
-                Toast.makeText(binding.context, R.string.allow_sync_after_10min, Toast.LENGTH_LONG).show()
-                return
-            }
-            val searchItems = ArrayList<SearchItem>()
-            searchItems.add(SearchItem(it.keyWord, it.mallName))
-            NShopSearch.search(searchItems, object : NShopSearch.Listener {
-                override fun onPrepare() {
-                    binding.imgButtonUpdate.startAnimation(AnimationUtils.loadAnimation(binding.context, R.anim.rotate))
-
-                }
-
-                override fun onComplete(results: List<SearchItem>?) {
-                    binding.imgButtonUpdate.clearAnimation()
-                    SearchItemRepository.saveAll(results)
-                }
-
-            })
         }
     }
 }

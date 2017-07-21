@@ -60,6 +60,8 @@
     <string name="dialog_message_delete_all">"모두 삭제 하시겠습니까?"</string>
     <string name="you_need_update">"업데이트 필요함"</string>
     <string name="you_need_update_desc">"사용에 제약이 있을 수 있습니다.\n업데이트 하시겠습니까?"</string>
+    <string name="update_notice">Update notice</string>
+    <string name="update_notice_title">Update notice</string>
     <string-array name="pref_sync_frequency_titles">
         <item>1 분</item>
         <item>5 분</item>

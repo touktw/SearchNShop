@@ -14,12 +14,6 @@ import retrofit2.http.Query
 interface NaverSearchService {
     @Headers("X-Naver-Client-Id: x5I5QXUNmtF3UEM7Bhek", "X-Naver-Client-Secret: Xb5boXN0s8")
     @GET("search/shop.json")
-    fun getShopItems(@Query("query") query: String,
-                     @Query("start") start: Int,
-                     @Query("display") display: Int): Call<NaverSearchResult>
-
-    @Headers("X-Naver-Client-Id: x5I5QXUNmtF3UEM7Bhek", "X-Naver-Client-Secret: Xb5boXN0s8")
-    @GET("search/shop.json")
     fun getShopItemsForFireBase(@Query("query") query: String,
                                 @Query("start") start: Int,
                                 @Query("display") display: Int): Call<NaverSearchResult2>

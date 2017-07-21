@@ -24,7 +24,6 @@ class AddItemModel(val context: Context, val listener: Listener?) {
     }
 
     fun onCheckedChanged(button: CompoundButton, isChecked: Boolean) {
-        preference().edit().putBoolean("remind_mall_name", isChecked).apply()
     }
 
     private fun isChecked(): Boolean {
@@ -33,7 +32,7 @@ class AddItemModel(val context: Context, val listener: Listener?) {
 
     fun submit(keywords: String?, mallName: String?) {
         keywords?.let { it ->
-            var mall: String = ""
+            var mall: String
             if (mallName.isNullOrEmpty()) {
                 val h = hint.get()
                 if (h.isNullOrEmpty()) return
@@ -45,15 +44,18 @@ class AddItemModel(val context: Context, val listener: Listener?) {
             val keywordArray = it.split(",")
             val target = ArrayList<SearchItem>()
             for (keyword in keywordArray) {
-                val item = SearchItem(keyword.trim(), mall)
+                val query = keyword.trim().replace(" ", "")
+                val item = SearchItem(query, mall)
                 if (SearchItemRepository.get(item.id) == null) {
-//                    SearchItemRepository.save(item)
+                    SearchItemRepository.save(item)
                     target.add(item)
                 }
             }
             if (isChecked.get()) {
                 preference().edit().putString("mall_name", mall).apply()
             }
+            preference().edit().putBoolean("remind_mall_name",
+                    (hint.get().isNotEmpty() && isChecked.get())).apply()
             listener?.onSubmitted(target)
         }
     }
