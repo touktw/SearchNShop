@@ -38,6 +38,9 @@ abstract class RealmManager<ITEM_T : RealmObject> : DBManager<ITEM_T> {
     override fun getAll(): List<ITEM_T>? =
             DB.realm()?.where(clazz)?.findAll()
 
+    fun getAllByField(field: String?, value: String?): List<ITEM_T>? =
+            DB.realm()?.where(clazz)?.equalTo(field, value)?.findAll()
+
     override fun delete(id: String?) {
         DB.realm()?.beginTransaction()
         DB.realm()?.where(SearchItem::class.java)
@@ -90,7 +93,7 @@ abstract class RealmManager<ITEM_T : RealmObject> : DBManager<ITEM_T> {
 }
 
 object DB {
-    val SCHEME_VERSION = 3
+    val SCHEME_VERSION = 2
     val config = RealmConfiguration.Builder().schemaVersion(SCHEME_VERSION.toLong())
             .migration(Migration).build()
 
@@ -107,26 +110,26 @@ object DB {
                 val objectSchema = schema.get("SearchItem")
                 objectSchema.addField("lastSearchTime", Long::class.java)
             }
-            if (old <= 2L) {
-                val items = realm.where("SearchItem").findAll()
-                for (item in items) {
-                    val searchItem = SearchItem(item)
-                    if (searchItem.keyWord?.contains(" ") ?: false) {
-                        searchItem.removeSpacing()
-                        if (realm.where("SearchItem")
-                                .equalTo("id", searchItem.id)
-                                .findFirst() == null) {
-                            val newObj = realm.createObject("SearchItem", searchItem.id)
-                            newObj.set("keyWord", searchItem.keyWord)
-                            newObj.set("mallName", searchItem.mallName)
-                            newObj.set("lastSearchTime", searchItem.lastSearchTime)
-                            newObj.setList("items", searchItem.getTransItems())
-
-                        }
-                        item.deleteFromRealm()
-                    }
-                }
-            }
+//            if (old <= 2L) {
+//                val items = realm.where("SearchItem").findAll()
+//                for (item in items) {
+//                    val searchItem = SearchItem(item)
+//                    if (searchItem.keyWord?.contains(" ") ?: false) {
+//                        searchItem.removeSpacing()
+//                        if (realm.where("SearchItem")
+//                                .equalTo("id", searchItem.id)
+//                                .findFirst() == null) {
+//                            val newObj = realm.createObject("SearchItem", searchItem.id)
+//                            newObj.set("keyWord", searchItem.keyWord)
+//                            newObj.set("mallName", searchItem.mallName)
+//                            newObj.set("lastSearchTime", searchItem.lastSearchTime)
+//                            newObj.setList("items", searchItem.getTransItems())
+//
+//                        }
+//                        item.deleteFromRealm()
+//                    }
+//                }
+//            }
         }
 
     }

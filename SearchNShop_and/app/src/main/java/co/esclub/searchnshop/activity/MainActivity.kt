@@ -1,13 +1,18 @@
 package co.esclub.searchnshop.activity
 
+import android.arch.lifecycle.LifecycleOwner
+import android.arch.lifecycle.LifecycleRegistry
+import android.arch.lifecycle.LifecycleRegistryOwner
 import android.content.Intent
 import android.databinding.DataBindingUtil
 import android.os.Bundle
 import android.preference.PreferenceManager
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
+import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.CheckBox
 import co.esclub.searchnshop.BuildConfig
 import co.esclub.searchnshop.R
 import co.esclub.searchnshop.databinding.ActivityMainBinding
@@ -19,7 +24,12 @@ import io.realm.RealmChangeListener
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
 
-class MainActivity : AppCompatActivity(), RealmChangeListener<Realm> {
+class MainActivity : AppCompatActivity(), RealmChangeListener<Realm>, LifecycleRegistryOwner {
+    val lifecycleRegistry = LifecycleRegistry(this)
+    override fun getLifecycle(): LifecycleRegistry {
+        return lifecycleRegistry
+    }
+
     val TAG = MainActivity::class.java.simpleName
     val model = MainViewModel(this)
 
@@ -119,21 +129,29 @@ class MainActivity : AppCompatActivity(), RealmChangeListener<Realm> {
             startActivityForResult(Intent(this, IntroActivity::class.java), REQ_INTRO)
             pref.edit().putBoolean("is_intro_showed", true).apply()
         } else {
-            model.showPrompt()
+            model.showPrompt({
+                showNewVersionNotice()
+            })
         }
     }
 
     fun showNewVersionNotice() {
-        if (!PreferenceManager.getDefaultSharedPreferences(this)
-                .getBoolean("isShowed${BuildConfig.VERSION_NAME}Notice", false)) {
+        val pref = PreferenceManager.getDefaultSharedPreferences(this)
+        if (!pref.getBoolean("isShowed127Notice", false)) {
+            val rootView = LayoutInflater.from(this).inflate(R.layout.checkbox, null)
+            val checkBox = rootView.findViewById(R.id.checkbox) as CheckBox
+            val padding = (resources.displayMetrics.density * 8 + 0.5f).toInt()
+            checkBox.setText(R.string.dont_show_again)
             AlertDialog.Builder(this)
                     .setTitle(R.string.update_notice_title)
                     .setMessage(R.string.update_notice)
-                    .setCancelable(false)
+                    .setView(rootView)
                     .setPositiveButton(android.R.string.ok, { dialog, _ ->
+                        pref.edit().putBoolean("isShowed127Notice", checkBox.isChecked).apply()
                         dialog.dismiss()
                     })
                     .show()
+
         }
     }
 
@@ -141,7 +159,9 @@ class MainActivity : AppCompatActivity(), RealmChangeListener<Realm> {
         super.onActivityResult(requestCode, resultCode, data)
         when (requestCode) {
             REQ_INTRO -> {
-                model.showPrompt()
+                model.showPrompt({
+                    showNewVersionNotice()
+                })
             }
         }
     }

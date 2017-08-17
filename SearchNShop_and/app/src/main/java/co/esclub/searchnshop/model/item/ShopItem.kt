@@ -1,6 +1,6 @@
 package co.esclub.searchnshop.model.item
 
-import co.esclub.searchnshop.model.firebase.NItem
+import co.esclub.searchnshop.model.firebase.ShopItem
 import com.google.gson.annotations.SerializedName
 import io.realm.DynamicRealmObject
 import io.realm.RealmObject
@@ -26,7 +26,7 @@ open class ShopItem : RealmObject, Item {
         this.position = position
     }
 
-    constructor(item: NItem) {
+    constructor(item: ShopItem) {
         this.title = item.title
         this.link = item.link
         this.image = item.image

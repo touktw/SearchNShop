@@ -7,12 +7,15 @@ import android.preference.PreferenceManager
 import android.widget.CompoundButton
 import co.esclub.searchnshop.model.item.SearchItem
 import co.esclub.searchnshop.model.repository.SearchItemRepository
+import co.esclub.searchnshop.util.LogCat
 
 /**
  * Created by tae.kim on 16/07/2017.
  */
 
 class AddItemModel(val context: Context, val listener: Listener?) {
+    val TAG = AddItemModel::class.java.simpleName
+
     interface Listener {
         fun onSubmitted(target: List<SearchItem>)
     }
@@ -24,10 +27,13 @@ class AddItemModel(val context: Context, val listener: Listener?) {
     }
 
     fun onCheckedChanged(button: CompoundButton, isChecked: Boolean) {
+        this.isChecked.set(isChecked)
     }
 
     private fun isChecked(): Boolean {
-        return preference().getBoolean("remind_mall_name", false)
+        val isChecked = preference().getBoolean("remind_mall_name", false)
+        LogCat.d(TAG, "isChecked:${isChecked}")
+        return isChecked
     }
 
     fun submit(keywords: String?, mallName: String?) {
@@ -44,18 +50,21 @@ class AddItemModel(val context: Context, val listener: Listener?) {
             val keywordArray = it.split(",")
             val target = ArrayList<SearchItem>()
             for (keyword in keywordArray) {
-                val query = keyword.trim().replace(" ", "")
-                val item = SearchItem(query, mall)
-                if (SearchItemRepository.get(item.id) == null) {
-                    SearchItemRepository.save(item)
-                    target.add(item)
+                if (keyword.isNotEmpty() && keyword.isNotBlank()) {
+                    val item = SearchItem(keyword, mall)
+                    if (SearchItemRepository.get(item.id) == null) {
+                        SearchItemRepository.save(item)
+                        target.add(item)
+                    }
                 }
             }
-            if (isChecked.get()) {
+            val isChecked = this.isChecked.get()
+            val isNotEmpty = mall.isNotEmpty()
+            LogCat.d(TAG, "submit isChecked:${isChecked} isNotEmpty:${isNotEmpty}")
+            if (isChecked && isNotEmpty) {
                 preference().edit().putString("mall_name", mall).apply()
+                preference().edit().putBoolean("remind_mall_name", isChecked).apply()
             }
-            preference().edit().putBoolean("remind_mall_name",
-                    (hint.get().isNotEmpty() && isChecked.get())).apply()
             listener?.onSubmitted(target)
         }
     }

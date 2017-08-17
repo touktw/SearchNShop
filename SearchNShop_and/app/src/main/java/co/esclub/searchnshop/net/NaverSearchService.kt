@@ -16,7 +16,7 @@ interface NaverSearchService {
     @GET("search/shop.json")
     fun getShopItemsForFireBase(@Query("query") query: String,
                                 @Query("start") start: Int,
-                                @Query("display") display: Int): Call<NaverSearchResult2>
+                                @Query("display") display: Int): Call<NaverSearchResult>
 
 
     companion object {

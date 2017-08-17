@@ -15,8 +15,8 @@
             android:layout_height="match_parent">
 
         <android.support.v7.widget.CardView
-                android:onLongClick="@{() -> safeUnbox(mainViewModel.isDeleteMode) ? true : mainViewModel.onItemLongClick(model)}"
-                android:onClick="@{(v) -> safeUnbox(mainViewModel.isDeleteMode) ? mainViewModel.onDeleteItemSelect(model) : model.itemSelect()}"
+                android:onLongClick="@{() -> mainViewModel.isDeleteMode.get() ? true : mainViewModel.onItemLongClick(model)}"
+                android:onClick="@{(v) -> mainViewModel.isDeleteMode.get() ? mainViewModel.onDeleteItemSelect(model) : model.itemSelect(mainViewModel)}"
                 android:layout_width="match_parent"
                 android:background="@color/trGrey"
                 android:layout_height="wrap_content"

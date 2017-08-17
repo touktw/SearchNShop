@@ -1,6 +1,9 @@
 package co.esclub.searchnshop.viewmodel
 
 import android.app.Activity
+import android.arch.lifecycle.Lifecycle
+import android.arch.lifecycle.LifecycleRegistry
+import android.arch.lifecycle.OnLifecycleEvent
 import android.content.DialogInterface
 import android.content.Intent
 import android.databinding.DataBindingUtil
@@ -8,6 +11,7 @@ import android.databinding.Observable
 import android.databinding.ObservableField
 import android.net.Uri
 import android.os.Handler
+import android.os.HandlerThread
 import android.preference.PreferenceManager
 import android.support.v7.app.AlertDialog
 import android.text.format.DateUtils
@@ -20,7 +24,6 @@ import co.esclub.searchnshop.model.firebase.FirebaseDBManager
 import co.esclub.searchnshop.model.firebase.FirebaseService
 import co.esclub.searchnshop.model.item.SearchItem
 import co.esclub.searchnshop.model.repository.SearchItemRepository
-import co.esclub.searchnshop.service.UpdateServiceLauncher
 import co.esclub.searchnshop.ui.PromptProvider
 import co.esclub.searchnshop.util.LogCat
 import kotlinx.android.synthetic.main.activity_main.*
@@ -33,19 +36,23 @@ import kotlin.collections.ArrayList
  * Created by tae.kim on 16/07/2017.
  */
 
-class MainViewModel(activity: Activity) : ActivityViewModel(activity) {
+class MainViewModel(private val activity: Activity) : ActivityViewModel() {
+
+
     val TAG = MainViewModel::class.java.simpleName
     val isDeleteMode = ObservableField<Boolean>(false)
     val adapter = RecyclerAdapter(activity, this)
     val deleteItemIds = ArrayList<String>()
-    var updateService: UpdateServiceLauncher? = null
+    var firebaseManager: FirebaseDBManager? = null
+    val updater = UpdateService()
 
-    override fun onCreate() {
+    @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
+    fun onCreate() {
         LogCat.d(TAG, "onCreate")
         FirebaseService.signIn({ isSignIn ->
             if (isSignIn) {
                 checkVersion()
-                FirebaseDBManager.init()
+                firebaseManager = FirebaseDBManager()
             }
         })
     }
@@ -55,9 +62,9 @@ class MainViewModel(activity: Activity) : ActivityViewModel(activity) {
                 .getLong("lastVersionCheckTime", 0)
         val currTime = System.currentTimeMillis()
         if (currTime - lastCheckTime > DateUtils.DAY_IN_MILLIS) {
-            FirebaseDBManager.checkVersion { version ->
-                LogCat.d(TAG, "onCreate version:${version}")
-                if (BuildConfig.VERSION_CODE < version) {
+            firebaseManager?.checkVersion { v ->
+                LogCat.d(TAG, "onCreate version:${v}")
+                if (BuildConfig.VERSION_CODE < v) {
                     LogCat.d(TAG, "need to update")
                     showNeedUpdate()
                     PreferenceManager.getDefaultSharedPreferences(activity)
@@ -86,24 +93,26 @@ class MainViewModel(activity: Activity) : ActivityViewModel(activity) {
                 .show()
     }
 
-    override fun onResume() {
+    @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
+    fun onResume() {
         LogCat.d(TAG, "onResume")
-        if (updateService == null) updateService = UpdateServiceLauncher(activity)
-        updateService?.run()
+        updater.run()
     }
 
-    override fun onPause() {
+    @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
+    fun onPause() {
         LogCat.d(TAG, "onPause")
-        updateService?.cancel()
+        updater.stop()
     }
 
-    override fun onDestroy() {
+    @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
+    fun onDestroy() {
         LogCat.d(TAG, "onDestroy")
     }
 
     var promptShowed: Boolean = false
 
-    fun showPrompt() {
+    fun showPrompt(listener: (() -> Unit)?) {
         val pref = PreferenceManager.getDefaultSharedPreferences(activity)
         if (!pref.getBoolean("is_prompt_showed", false)) {
             promptShowed = true
@@ -123,6 +132,7 @@ class MainViewModel(activity: Activity) : ActivityViewModel(activity) {
                     override fun onEnd() {
                         promptShowed = false
                         pref.edit().putBoolean("is_prompt_showed", true).apply()
+                        listener?.invoke()
                     }
                 })
             }, 500)
@@ -145,7 +155,7 @@ class MainViewModel(activity: Activity) : ActivityViewModel(activity) {
                         }
                     }
                     SearchItemRepository.deleteAll(deleteItems)
-                    FirebaseDBManager.deleteAll(deleteItems)
+                    firebaseManager?.delete(deleteItems)
 
                     isDeleteMode.set(false)
                     dialog.dismiss()
@@ -201,9 +211,7 @@ class MainViewModel(activity: Activity) : ActivityViewModel(activity) {
         val view = LayoutInflater.from(activity).inflate(R.layout.add_item, null)
         val model = AddItemModel(activity, object : AddItemModel.Listener {
             override fun onSubmitted(target: List<SearchItem>) {
-                FirebaseDBManager.addNew(target, {
-
-                })
+                firebaseManager?.add(target)
                 adapter.notifyDataSetChanged()
             }
 
@@ -220,5 +228,39 @@ class MainViewModel(activity: Activity) : ActivityViewModel(activity) {
                 })
                 .setNegativeButton(R.string.cancel, null)
                 .show()
+    }
+
+
+    inner class UpdateService {
+        val UPDATE_DELAY_MIN = DateUtils.MINUTE_IN_MILLIS
+        var updateDelay = UPDATE_DELAY_MIN
+        val TAG = UpdateService::class.java.simpleName
+        val thread: HandlerThread
+        val handler: Handler
+
+        init {
+            thread = HandlerThread(TAG)
+            thread.start()
+            handler = Handler(thread.looper)
+        }
+
+
+        val callback: Runnable = Runnable {
+            run()
+        }
+
+        // 5min ~ 10min
+        fun run() {
+            firebaseManager?.checkUpdate()
+            val delay = (60 + Random().nextInt(60)) * DateUtils.SECOND_IN_MILLIS
+            LogCat.d(TAG, "run update delay ${delay}ms")
+            handler.postDelayed(callback, delay)
+        }
+
+        fun stop() {
+            handler.removeCallbacks(callback)
+        }
+
+
     }
 }

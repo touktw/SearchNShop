@@ -7,6 +7,7 @@ import co.esclub.searchnshop.activity.DetailActivity
 import co.esclub.searchnshop.databinding.CardItem3Binding
 import co.esclub.searchnshop.model.item.SearchItem
 import co.esclub.searchnshop.util.Const
+import co.esclub.searchnshop.util.LogCat
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -17,6 +18,7 @@ import java.util.*
 val SDF = SimpleDateFormat("yyyy.MM.dd hh:mm a", Locale.getDefault())
 
 class SearchItemViewModel(val item: SearchItem, val binding: CardItem3Binding) {
+    val TAG = SearchItemViewModel::class.java.simpleName
     val imageUrl = ObservableField<String>()
     val itemSize = ObservableField<Int>(item.items.size)
     val deleteChecked = ObservableField<Boolean>(false)
@@ -45,7 +47,8 @@ class SearchItemViewModel(val item: SearchItem, val binding: CardItem3Binding) {
         return content ?: "[]"
     }
 
-    fun itemSelect() {
+    fun itemSelect(mainModel: MainViewModel?) {
+        LogCat.d(TAG, "itemSelect isDeleteMode:${mainModel?.isDeleteMode?.get()}")
         if (item.items.size > 0) {
             val intent = Intent(binding.context, DetailActivity::class.java)
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)

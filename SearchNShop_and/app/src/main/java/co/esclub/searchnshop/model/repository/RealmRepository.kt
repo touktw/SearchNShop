@@ -3,6 +3,7 @@ package co.esclub.searchnshop.model.repository
 import co.esclub.searchnshop.model.db.RealmManager
 import co.esclub.searchnshop.model.db.SearchItemRealmManager
 import co.esclub.searchnshop.model.firebase.SearchData
+import co.esclub.searchnshop.model.firebase.SearchResult
 import co.esclub.searchnshop.model.item.SearchItem
 import co.esclub.searchnshop.model.item.ShopItem
 import co.esclub.searchnshop.util.LogCat
@@ -42,24 +43,33 @@ abstract class RealmRepository<ITEM_T : RealmObject> : Repository<ITEM_T> {
     override fun getAll(): List<ITEM_T>? {
         return db.getAll()
     }
+
+    fun getAllByField(field: String?, value: String?): List<ITEM_T>? {
+        return db.getAllByField(field, value)
+    }
 }
 
 object SearchItemRepository : RealmRepository<SearchItem>() {
     val TAG = SearchItemRepository::class.java.simpleName
     override val db = SearchItemRealmManager
     fun dump() = db.dump()
-    fun updateItem(searchItem: SearchItem, data: SearchData) {
+    fun updateItem(searchItem: SearchItem, searchResult: SearchResult) {
         LogCat.d(TAG, "updateItem")
         val realm = db.realm()
         realm?.let {
             it.beginTransaction()
-            searchItem.lastSearchTime = data.lastUpdateTime
+            searchItem.lastSearchTime = searchResult.updateTime ?: 0
             searchItem.items.clear()
-            val matchedItems = data.items.filter { it.mallName == searchItem.mallName }
-            for (matchedItem in matchedItems) {
-                searchItem.items.add(ShopItem(matchedItem))
+            searchResult.shopItem?.filter { it.mallName == searchItem.mallName }?.let {
+                for (matchedItem in it) {
+                    searchItem.items.add(ShopItem(matchedItem))
+                }
             }
             it.commitTransaction()
         }
+    }
+
+    fun getAllByKeyword(keyword: String?): List<SearchItem>? {
+        return getAllByField("keyWord", keyword)
     }
 }
