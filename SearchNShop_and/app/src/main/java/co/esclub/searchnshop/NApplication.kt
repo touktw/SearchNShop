@@ -2,6 +2,8 @@ package co.esclub.searchnshop
 
 import android.app.Application
 import co.esclub.searchnshop.model.db.SearchItemRealmManager
+import co.esclub.searchnshop.model.firebase.FirebaseService
+import co.esclub.searchnshop.util.UUIDFactory
 import io.realm.Realm
 
 /**
@@ -11,6 +13,7 @@ import io.realm.Realm
 class NApplication : Application() {
     override fun onCreate() {
         super.onCreate()
+        UUIDFactory.init(applicationContext)
         Realm.init(this)
     }
 

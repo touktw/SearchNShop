@@ -1,32 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        android:orientation="vertical"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_margin="16dp"
-        android:padding="8dp">
-    <LinearLayout android:layout_width="match_parent"
-                  android:layout_height="wrap_content">
-        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                  android:text="키워드"/>
-        <EditText android:layout_width="match_parent" android:layout_height="wrap_content"
-                  android:id="@+id/editKeyWord"
-                  android:layout_marginLeft="16dp"/>
-    </LinearLayout>
-    <LinearLayout android:layout_width="match_parent"
-                  android:layout_height="wrap_content">
-        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                  android:text="상점명"/>
-        <EditText android:layout_width="match_parent" android:layout_height="wrap_content"
-                  android:id="@+id/editMallName"
-                  android:layout_marginLeft="16dp"/>
-    </LinearLayout>
-    <CheckBox
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/remindMallName"
-            android:id="@+id/checkBoxRemindMallName"/>
+<layout
+        xmlns:android="http://schemas.android.com/apk/res/android">
+    <data>
+        <variable name="model" type="co.esclub.searchnshop.viewmodel.AddItemModel"/>
+    </data>
+    <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="16dp"
+            android:padding="8dp">
+        <LinearLayout android:layout_width="match_parent"
+                      android:layout_height="wrap_content">
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                      android:text="키워드"/>
+            <EditText android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:id="@+id/editKeyWord"
+                      android:layout_marginStart="16dp"/>
+        </LinearLayout>
+        <LinearLayout android:layout_width="match_parent"
+                      android:layout_height="wrap_content">
+            <TextView android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:text="상점명"/>
+            <EditText android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:id="@+id/editMallName"
+                      android:hint="@{model.hint}"
+                      android:layout_marginStart="16dp"/>
+        </LinearLayout>
+        <CheckBox
+                android:checked="@{safeUnbox(model.isChecked)}"
+                android:onCheckedChanged="@{model::onCheckedChanged}"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/remindMallName"
+                android:id="@+id/checkBoxRemindMallName"/>
 
 
-</LinearLayout>
+    </LinearLayout>
+</layout>

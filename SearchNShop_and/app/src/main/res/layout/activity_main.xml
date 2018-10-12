@@ -1,64 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:ads="http://schemas.android.com/apk/res-auto"
-        android:layout_height="match_parent"
-        android:layout_width="match_parent">
-
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools">
+    <data>
+        <variable name="model" type="co.esclub.searchnshop.viewmodel.MainViewModel"/>
+    </data>
     <RelativeLayout
-            android:id="@+id/layoutAds"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true">
 
-        <!--<com.google.android.gms.ads.AdView-->
-                <!--android:id="@+id/adView"-->
-                <!--ads:adSize="BANNER"-->
-                <!--ads:adUnitId="@string/banner_ad_unit_id"-->
-                <!--android:layout_alignParentStart="true"-->
-                <!--android:layout_centerVertical="true"-->
-                <!--android:layout_width="match_parent"-->
-                <!--android:layout_height="wrap_content"/>-->
-        <!--<android.support.design.widget.FloatingActionButton-->
-                <!--android:id="@+id/fab"-->
-                <!--android:layout_width="wrap_content"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:layout_alignParentEnd="true"-->
-                <!--android:layout_margin="@dimen/fab_margin"-->
-                <!--android:src="@drawable/ic_add_white_24dp"-->
-        <!--/>-->
-    </RelativeLayout>
-
-
-    <android.support.design.widget.CoordinatorLayout
-            xmlns:android="http://schemas.android.com/apk/res/android"
-            xmlns:app="http://schemas.android.com/apk/res-auto"
-            xmlns:tools="http://schemas.android.com/tools"
-            android:layout_above="@+id/layoutAds"
-            android:layout_width="match_parent"
             android:layout_height="match_parent"
-            tools:context="co.esclub.searchnshop.activity.MainActivity">
-        <android.support.design.widget.AppBarLayout
-                android:layout_height="wrap_content"
+            android:layout_width="match_parent">
+
+        <RelativeLayout
+                android:id="@+id/layoutAds"
                 android:layout_width="match_parent"
-                android:theme="@style/AppTheme.AppBarOverlay">
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true">
+        </RelativeLayout>
 
 
-            <android.support.v7.widget.Toolbar
-                    android:id="@+id/toolbar"
+        <android.support.design.widget.CoordinatorLayout
+                android:layout_above="@+id/layoutAds"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                tools:context="co.esclub.searchnshop.activity.MainActivity">
+            <android.support.design.widget.AppBarLayout
+                    android:layout_height="wrap_content"
                     android:layout_width="match_parent"
-                    android:layout_height="?attr/actionBarSize"
-                    android:background="?attr/colorPrimary"
-                    app:titleTextColor="@color/textPrimary"
-                    app:subtitleTextColor="@color/textPrimary"
-                    app:popupTheme="@style/AppTheme.PopupOverlay">
-            </android.support.v7.widget.Toolbar>
+                    android:theme="@style/AppTheme.AppBarOverlay">
 
 
-        </android.support.design.widget.AppBarLayout>
+                <android.support.v7.widget.Toolbar
+                        android:id="@+id/toolbar"
+                        app:title="@{safeUnbox(model.isDeleteMode) ? @string/delete_mode : @string/app_name}"
+                        android:layout_width="match_parent"
+                        android:layout_height="?attr/actionBarSize"
+                        android:background="?attr/colorPrimary"
+                        app:titleTextColor="@color/textPrimary"
+                        app:subtitleTextColor="@color/textPrimary"
+                        app:popupTheme="@style/AppTheme.PopupOverlay">
+                </android.support.v7.widget.Toolbar>
 
-        <include layout="@layout/content_main"/>
 
+            </android.support.design.widget.AppBarLayout>
 
-    </android.support.design.widget.CoordinatorLayout>
-</RelativeLayout>
+            <include layout="@layout/content_main"
+                     app:model="@{model}"/>
+
+        </android.support.design.widget.CoordinatorLayout>
+    </RelativeLayout>
+</layout>

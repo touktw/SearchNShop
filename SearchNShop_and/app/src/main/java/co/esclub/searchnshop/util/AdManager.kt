@@ -29,8 +29,8 @@ class AdManager(val type: AdProvider, val context: Context) {
                 (adView as com.google.android.gms.ads.AdView).adSize = com.google.android.gms.ads.AdSize.SMART_BANNER
                 (adView as com.google.android.gms.ads.AdView).adUnitId = AD_MOB_KEY
             } else if (type == FACEBOOK) {
-                adView = com.facebook.ads.AdView(context, FACEBOOK_KEY,
-                        com.facebook.ads.AdSize.BANNER_HEIGHT_50)
+//                adView = com.facebook.ads.AdView(context, FACEBOOK_KEY,
+//                        com.facebook.ads.AdSize.BANNER_HEIGHT_50)
             }
         }
     }
@@ -38,16 +38,18 @@ class AdManager(val type: AdProvider, val context: Context) {
     fun load() {
         if (adView is com.google.android.gms.ads.AdView) {
             (adView as com.google.android.gms.ads.AdView).loadAd(AdRequest.Builder().build())
-        } else if (adView is com.facebook.ads.AdView) {
-            (adView as com.facebook.ads.AdView).loadAd()
         }
+// else if (adView is com.facebook.ads.AdView) {
+//            (adView as com.facebook.ads.AdView).loadAd()
+//        }
     }
 
     fun destroy() {
         if (adView is com.google.android.gms.ads.AdView) {
             (adView as com.google.android.gms.ads.AdView).destroy()
-        } else if (adView is com.facebook.ads.AdView) {
-            (adView as com.facebook.ads.AdView).destroy()
         }
+//        else if (adView is com.facebook.ads.AdView) {
+//            (adView as com.facebook.ads.AdView).destroy()
+//        }
     }
 }

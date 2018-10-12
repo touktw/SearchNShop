@@ -1,84 +1,99 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:id="@+id/cardView"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent">
-
-    <android.support.v7.widget.CardView
-            xmlns:android="http://schemas.android.com/apk/res/android"
-            xmlns:card_view="http://schemas.android.com/apk/res-auto"
+<layout xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tool="http://schemas.android.com/tools"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:card_view="http://schemas.android.com/apk/res-auto">
+    <data>
+        <import type="android.view.View"/>
+        <variable name="context" type="android.content.Context"/>
+        <variable name="model" type="co.esclub.searchnshop.viewmodel.SearchItemViewModel"/>
+        <variable name="mainViewModel" type="co.esclub.searchnshop.viewmodel.MainViewModel"/>
+    </data>
+    <LinearLayout
+            android:id="@+id/cardView"
             android:layout_width="match_parent"
-            android:background="@color/trGrey"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="8dp"
-            android:layout_marginRight="8dp"
-            android:layout_marginTop="4dp"
-            android:layout_marginBottom="4dp"
-            card_view:cardCornerRadius="5dp">
-        <RelativeLayout
-                android:visibility="invisible"
+            android:layout_height="match_parent">
+
+        <android.support.v7.widget.CardView
+                android:onLongClick="@{() -> mainViewModel.isDeleteMode.get() ? true : mainViewModel.onItemLongClick(model)}"
+                android:onClick="@{(v) -> mainViewModel.isDeleteMode.get() ? mainViewModel.onDeleteItemSelect(model) : model.itemSelect(mainViewModel)}"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
                 android:background="@color/trGrey"
-                android:id="@+id/deleteOverlay"/>
-        <RelativeLayout
-                android:id="@+id/cardLayout"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-            <ImageView android:layout_width="80dp"
-                       android:layout_height="80dp"
-                       android:background="@android:color/background_dark"
-                       android:layout_toLeftOf="@+id/imgButtonUpdate"
-                       android:layout_alignParentTop="true"
-                       android:src="@android:drawable/ic_menu_gallery"
-                       android:id="@+id/thumbImage"
-                       android:layout_margin="8dp"/>
-            <LinearLayout
-                    android:id="@+id/layoutText"
-                    android:orientation="vertical"
-                    android:layout_toLeftOf="@+id/thumbImage"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="4dp"
+                card_view:cardCornerRadius="5dp">
+            <RelativeLayout
+                    android:id="@+id/cardLayout"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginEnd="8dp"
-                    android:layout_alignParentStart="true">
-
-                <TextView android:layout_width="match_parent"
-                          android:layout_height="wrap_content"
-                          android:id="@+id/textTitle"
-                          android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                          android:maxLines="1"
-                          android:text="남자4부반바지,와이스토리지"
-                          android:textStyle="bold"/>
-
-                <TextView android:layout_width="match_parent"
-                          android:layout_height="wrap_content"
-                          android:id="@+id/textContent"
-                          android:textStyle="bold"
-                          android:maxLines="1"
-                          android:text="[25, 179, 240, 773]"
-                />
-                <TextView
+                    android:layout_height="match_parent">
+                <ImageView android:layout_width="80dp"
+                           android:layout_height="80dp"
+                           android:background="@android:color/background_dark"
+                           android:visibility="@{safeUnbox(model.itemSize) > 0 ? View.VISIBLE : View.GONE}"
+                           android:layout_toLeftOf="@+id/blayout"
+                           android:layout_alignParentTop="true"
+                           android:id="@+id/thumbImage"
+                           app:imageUrl="@{model.imageUrl}"
+                           tool:src="@android:drawable/ic_menu_gallery"
+                           android:layout_margin="8dp"/>
+                <LinearLayout
+                        android:id="@+id/layoutText"
+                        android:orientation="vertical"
+                        android:layout_toLeftOf="@+id/thumbImage"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:id="@+id/textDate"
-                        android:textStyle="italic"
-                        android:textSize="12sp"
-                        android:textColor="@android:color/darker_gray"
-                        android:text="2017.06.13 03:40 오후"
-                />
-            </LinearLayout>
-            <ImageButton
-                    android:layout_marginEnd="8dp"
-                    android:layout_width="45dp"
-                    android:layout_height="45dp"
-                    android:layout_alignParentEnd="true"
-                    android:layout_centerVertical="true"
-                    android:id="@+id/imgButtonUpdate"
-                    android:background="@android:color/transparent"
-                    android:src="@drawable/ic_autorenew_black_36dp"/>
-        </RelativeLayout>
+                        android:layout_centerVertical="true"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginEnd="8dp"
+                        android:layout_alignParentStart="true">
+                    <TextView android:layout_width="match_parent"
+                              android:layout_height="wrap_content"
+                              android:id="@+id/textTitle"
+                              android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                              android:maxLines="1"
+                              tool:text="남자4부반바지,와이스토리지"
+                              android:text="@{model.title}"
+                              android:textStyle="bold"/>
+                    <TextView android:layout_width="match_parent"
+                              android:layout_height="wrap_content"
+                              android:id="@+id/textContent"
+                              android:textStyle="bold"
+                              android:maxLines="1"
+                              android:text="@{model.content}"
+                              tool:text="[25, 179, 240, 773]"
+                    />
+                    <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/textDate"
+                            android:textStyle="italic"
+                            android:textSize="12sp"
+                            android:textColor="@android:color/darker_gray"
+                            android:text="@{model.time}"
+                            tool:text="2017.06.13 03:40 오후"
+                    />
+                </LinearLayout>
+                <FrameLayout
+                        android:layout_marginEnd="8dp"
+                             android:layout_width="wrap_content"
+                             android:layout_height="45dp"
+                             android:layout_alignParentEnd="true"
+                             android:layout_centerVertical="true"
+                             android:id="@+id/blayout">
+                    <CheckBox
+                            tool:visibility="visible"
+                            android:checked="@{safeUnbox(model.deleteChecked)}"
+                            android:onCheckedChanged="@{(cb, isChecked) -> mainViewModel.onDeleteSelected(isChecked, model)}"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:visibility="@{safeUnbox(mainViewModel.isDeleteMode) ? View.VISIBLE : View.GONE}"/>
+                </FrameLayout>
 
-    </android.support.v7.widget.CardView>
-</LinearLayout>
+            </RelativeLayout>
+
+        </android.support.v7.widget.CardView>
+    </LinearLayout>
+</layout>
